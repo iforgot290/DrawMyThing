@@ -31,5 +31,13 @@ public class Main {
 	public void log(Object str) {
 		System.out.println("[" + Thread.currentThread().getName()+"] "+str);
 	}
+	
+	public GraphicsThread getGfxThread(){
+		return gfxthread;
+	}
+	
+	public GameThread getGameThread(){
+		return gamethread;
+	}
 
 }

@@ -1,7 +1,6 @@
 package me.neildennis.drawmything.thread;
 
 import javax.swing.JFrame;
-
 import me.neildennis.drawmything.Main;
 import me.neildennis.drawmything.screen.DrawComponent;
 import me.neildennis.drawmything.screen.ScreenManager;
@@ -25,14 +24,14 @@ public class GraphicsThread extends Thread{
 		frame.setResizable(false);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setTitle("DrawMyThing");
+		//frame.setSize(new Dimension(1800, 700));
 		
-		ScreenManager.init();
+		ScreenManager.init(frame);
 		
 		for (DrawComponent c : ScreenManager.getComponents()){
 			frame.add(c);
 		}
 		
-		frame.pack();
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 		
@@ -59,7 +58,7 @@ public class GraphicsThread extends Thread{
 			frames++;
 			if (System.currentTimeMillis() - timer > 1000) {
 				timer += 1000;
-				main.log(updates + " ups, " + frames + " fps");
+				frame.setTitle("DrawMyThing | "+frames+" fps "+updates+" ups");
 				updates = 0;
 				frames = 0;
 			}

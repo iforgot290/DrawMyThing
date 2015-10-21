@@ -18,6 +18,7 @@ public class GameThread extends Thread{
 	private boolean running = true;
 
 	private Color color = Color.BLACK;
+	private int stroke = 2;
 
 	public GameThread(){
 		main = Main.getMain();
@@ -56,11 +57,11 @@ public class GameThread extends Thread{
 			if (oldx - currentx == 0) {
 				if (oldy <= currenty)
 					for (int y = oldy; y <= currenty; y++){
-						stroke(2, drawarea.pixels, oldx, y, drawarea.getWidth(), color, false);
+						stroke(stroke, drawarea.pixels, oldx, y, drawarea.getWidth(), color, false);
 					}
 				else
 					for (int y = currenty; y <= oldy; y++)
-						stroke(2, drawarea.pixels, oldx, y, drawarea.getWidth(), color, false);
+						stroke(stroke, drawarea.pixels, oldx, y, drawarea.getWidth(), color, false);
 				return;
 			}
 
@@ -72,12 +73,12 @@ public class GameThread extends Thread{
 			if (oldx <= currentx){
 				for (int x = oldx; x <= currentx; x++){
 					int y = Math.round(slope * x + intercept);
-					stroke(2, drawarea.pixels, x, y, drawarea.getWidth(), color, false);
+					stroke(stroke, drawarea.pixels, x, y, drawarea.getWidth(), color, false);
 				}
 			} else {
 				for (int x = currentx; x <= oldx; x++){
 					int y = Math.round(slope * x + intercept);
-					stroke(2, drawarea.pixels, x, y, drawarea.getWidth(), color, false);
+					stroke(stroke, drawarea.pixels, x, y, drawarea.getWidth(), color, false);
 				}
 			}
 
@@ -86,12 +87,12 @@ public class GameThread extends Thread{
 			if (oldy < currenty)
 				for (int y = oldy; y < currenty; y++){
 					int x = Math.round((y-intercept)/slope);
-					stroke(2, drawarea.pixels, x, y, drawarea.getWidth(), color, false);
+					stroke(stroke, drawarea.pixels, x, y, drawarea.getWidth(), color, false);
 				}
 			else if (oldy > currenty)
 				for (int y = currenty; y <= oldy; y++){
 					int x = Math.round((y-intercept)/slope);
-					stroke(2, drawarea.pixels, x, y, drawarea.getWidth(), color, false);
+					stroke(stroke, drawarea.pixels, x, y, drawarea.getWidth(), color, false);
 				}
 
 		}
@@ -103,6 +104,10 @@ public class GameThread extends Thread{
 
 	public void setDrawColor(Color color) {
 		this.color = color;
+	}
+	
+	public void setStroke(int stroke){
+		this.stroke = stroke;
 	}
 
 }

@@ -23,9 +23,9 @@ public class ColorSelector extends DrawComponent{
 	private Graphics g;
 	
 	private BufferedImage clearbtn;
-	private BufferedImage strokebig;
-	private BufferedImage strokemed;
-	private BufferedImage strokesmall;
+	private Circle strokebig;
+	private Circle strokemed;
+	private Circle strokesmall;
 	
 	private Circle[] colorbtns = new Circle[]{
 			new Circle(18, 50, Color.BLACK),
@@ -55,9 +55,13 @@ public class ColorSelector extends DrawComponent{
 		
 		clearbtn = FileUtils.loadImage("/res/clearbtn.png");
 		
-		strokebig = new Circle(14, 50, Color.BLACK).getImage();
-		strokemed = new Circle(10, 50, Color.BLACK).getImage();
-		strokesmall = new Circle(5, 50, Color.BLACK).getImage();
+		strokebig = new Circle(14, 50, Color.BLACK);
+		strokemed = new Circle(10, 50, Color.BLACK);
+		strokesmall = new Circle(5, 50, Color.BLACK);
+		
+		strokesmall.reset();
+		strokebig.outline();
+		strokemed.outline();
 		
 		registerClicks();
 	}
@@ -69,13 +73,13 @@ public class ColorSelector extends DrawComponent{
 			return;
 		}
 		g = bs.getDrawGraphics();
-		g.setColor(Color.CYAN);
+		g.setColor(Color.WHITE);
 		g.fillRect(0, 0, width, height);
 		
 		g.drawImage(clearbtn, 0, getHeight()-50, null);
-		g.drawImage(strokebig, 0, getHeight()-110, null);
-		g.drawImage(strokemed, 0, getHeight()-137, null);
-		g.drawImage(strokesmall, 0, getHeight()-156, null);
+		g.drawImage(strokebig.getImage(), 0, getHeight()-110, null);
+		g.drawImage(strokemed.getImage(), 0, getHeight()-137, null);
+		g.drawImage(strokesmall.getImage(), 0, getHeight()-156, null);
 		
 		for (int c = 0; c < colorbtns.length; c++){
 			g.drawImage(colorbtns[c].getImage(), 0, colorbtns[c].getHeight() * c + btnoffset, null);
@@ -99,11 +103,19 @@ public class ColorSelector extends DrawComponent{
 				
 				if (isClearButton(x, y)){
 					ScreenManager.getDrawArea().clear();
+					return;
 				}
 				
 				Color color = getColorClicked(x, y);
 				if (color != null){
 					main.getGameThread().setDrawColor(color);
+					return;
+				}
+				
+				int stroke = getStrokeClicked(x, y);
+				if (stroke > 0) {
+					main.getGameThread().setStroke(stroke);
+					return;
 				}
 			}
 			
@@ -134,6 +146,32 @@ public class ColorSelector extends DrawComponent{
 	
 	public void clearColorSelected(){
 		for (Circle c : colorbtns) c.reset();
+	}
+	
+	public int getStrokeClicked(int x, int y){
+		
+		if (y > getHeight() - 110 && y < (getHeight() - 110) + strokebig.getHeight()){
+			strokebig.reset();
+			strokemed.outline();
+			strokesmall.outline();
+			return 12;
+		}
+		
+		if (y > getHeight() - 137 && y < (getHeight() - 137) + strokemed.getHeight()){
+			strokemed.reset();
+			strokebig.outline();
+			strokesmall.outline();
+			return 6;
+		}
+		
+		if (y > getHeight() - 156 && y < (getHeight() - 156) + strokesmall.getHeight()){
+			strokesmall.reset();
+			strokebig.outline();
+			strokemed.outline();
+			return 2;
+		}
+		
+		return 0;
 	}
 
 }

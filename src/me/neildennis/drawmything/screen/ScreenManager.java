@@ -1,5 +1,6 @@
 package me.neildennis.drawmything.screen;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.util.ArrayList;
 
@@ -15,6 +16,7 @@ public class ScreenManager {
 	
 	private static DrawArea drawarea;
 	private static ColorSelector colorsel;
+	private static ChatArea chatarea;
 	
 	private static int height = 900;
 	private static int width = height * 16/9;
@@ -23,9 +25,10 @@ public class ScreenManager {
 	
 	public static void init(JFrame frame){
 		layout = new SpringLayout();
-		frame.setLayout(layout);
 		
 		frame.setSize(new Dimension(width, height));
+		
+		frame.setLayout(layout);
 		
 		components = new ArrayList<DrawComponent>();
 		
@@ -35,6 +38,15 @@ public class ScreenManager {
 		components.add(colorsel = new ColorSelector(drawarea.getHeight()));
 		
 		layout.putConstraint(SpringLayout.WEST, drawarea, 0, SpringLayout.EAST, colorsel);
+		
+		for (Component c : components) frame.add(c);
+		
+		frame.setLocationRelativeTo(null);
+		frame.setVisible(true);
+		
+		components.add(chatarea = new ChatArea(drawbounds, frame.getContentPane().getHeight() - drawarea.getHeight()));
+		layout.putConstraint(SpringLayout.NORTH, chatarea, 0, SpringLayout.SOUTH, drawarea);
+		frame.add(chatarea);
 		
 		enabled = true;
 	}

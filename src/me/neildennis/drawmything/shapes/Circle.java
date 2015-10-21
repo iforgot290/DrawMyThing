@@ -66,5 +66,11 @@ public class Circle {
 		else
 			DrawUtils.stroke(radius, pixels, (int) (width/2), (int) (height/2), width, color, true);
 	}
+	
+	public void outline(){
+		for (int i = 0; i < pixels.length; i++) pixels[i] = 0xffffff;
+		
+		DrawUtils.circleBorder(radius, 1, pixels, (int) (width/2), (int) (height/2), width, color, true);
+	}
 
 }

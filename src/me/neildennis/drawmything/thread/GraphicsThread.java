@@ -24,16 +24,8 @@ public class GraphicsThread extends Thread{
 		frame.setResizable(false);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setTitle("DrawMyThing");
-		//frame.setSize(new Dimension(1800, 700));
 		
 		ScreenManager.init(frame);
-		
-		for (DrawComponent c : ScreenManager.getComponents()){
-			frame.add(c);
-		}
-		
-		frame.setLocationRelativeTo(null);
-		frame.setVisible(true);
 		
 		long lastTime = System.nanoTime();
 		double delta = 0.0;

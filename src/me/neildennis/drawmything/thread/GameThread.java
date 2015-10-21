@@ -4,11 +4,8 @@ import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import me.neildennis.drawmything.Main;
@@ -82,8 +79,6 @@ public class GameThread extends Thread{
 
 		});
 
-		int index = 0;
-
 		while (running){
 			Line2D line;
 			if ((line = lines.poll())!=null){
@@ -151,8 +146,7 @@ public class GameThread extends Thread{
 		int w = 2*stroke+2;
 		int h = 2*stroke+2;
 
-		BufferedImage image = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
-		int[] pix = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
+		int[] pix = new int[w*h];
 
 		int midx = stroke + 1;
 		int midy = stroke + 1;

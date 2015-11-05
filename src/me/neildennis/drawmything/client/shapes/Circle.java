@@ -1,10 +1,10 @@
-package me.neildennis.drawmything.shapes;
+package me.neildennis.drawmything.client.shapes;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 
-import me.neildennis.drawmything.utils.DrawUtils;
+import me.neildennis.drawmything.client.utils.DrawUtils;
 
 public class Circle {
 
@@ -33,9 +33,9 @@ public class Circle {
 		pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
 		
 		if (color == Color.WHITE)
-			DrawUtils.circleBorder(radius, 1, pixels, (int) (width/2), (int) (height/2), width, Color.BLACK, true);
+			DrawUtils.antiAliasBorder(radius, 1, image, (int) (width/2), (int) (height/2), Color.BLACK, true);
 		else
-			DrawUtils.stroke(radius, pixels, (int) (width/2), (int) (height/2), width, color, true);
+			DrawUtils.antiAlias(radius, image, (int) (width/2), (int) (height/2), color, true);
 	}
 
 	public BufferedImage getImage() {
@@ -55,22 +55,18 @@ public class Circle {
 	}
 
 	public void overlay(){
-		DrawUtils.circleBorder(radius, 2, pixels, (int) (width / 2), (int) (height / 2), width, Color.BLACK, false);
+		DrawUtils.antiAliasBorder(radius, 2, image, (int) (width / 2), (int) (height / 2), Color.BLACK, false);
 	}
 
 	public void reset(){
-		for (int i = 0; i < pixels.length; i++) pixels[i] = 0xffffff;
-		
 		if (color == Color.WHITE)
-			DrawUtils.circleBorder(radius, 1, pixels, (int) (width/2), (int) (height/2), width, Color.BLACK, true);
+			DrawUtils.antiAliasBorder(radius, 1, image, (int) (width/2), (int) (height/2), Color.BLACK, true);
 		else
-			DrawUtils.stroke(radius, pixels, (int) (width/2), (int) (height/2), width, color, true);
+			DrawUtils.antiAlias(radius, image, (int) (width/2), (int) (height/2), color, true);
 	}
 	
 	public void outline(){
-		for (int i = 0; i < pixels.length; i++) pixels[i] = 0xffffff;
-		
-		DrawUtils.circleBorder(radius, 1, pixels, (int) (width/2), (int) (height/2), width, color, true);
+		DrawUtils.antiAliasBorder(radius, 1, image, (int) (width / 2), (int) (height / 2), color, true);
 	}
 
 }

@@ -1,15 +1,17 @@
-package me.neildennis.drawmything.screen;
+package me.neildennis.drawmything.client.screen;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
-import me.neildennis.drawmything.Main;
-import me.neildennis.drawmything.shapes.Circle;
-import me.neildennis.drawmything.utils.FileUtils;
+
+import me.neildennis.drawmything.client.Main;
+import me.neildennis.drawmything.client.shapes.Circle;
+import me.neildennis.drawmything.client.utils.FileUtils;
 
 public class ColorSelector extends DrawComponent{
 
@@ -20,7 +22,7 @@ public class ColorSelector extends DrawComponent{
 	private int btnoffset = 0;
 	
 	private BufferStrategy bs;
-	private Graphics g;
+	private Graphics2D g;
 	
 	private BufferedImage clearbtn;
 	private Circle strokebig;
@@ -72,9 +74,11 @@ public class ColorSelector extends DrawComponent{
 			this.createBufferStrategy(3);
 			return;
 		}
-		g = bs.getDrawGraphics();
+		g = (Graphics2D) bs.getDrawGraphics();
 		g.setColor(Color.WHITE);
 		g.fillRect(0, 0, width, height);
+		
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		
 		g.drawImage(clearbtn, 0, getHeight()-50, null);
 		g.drawImage(strokebig.getImage(), 0, getHeight()-110, null);
@@ -102,7 +106,7 @@ public class ColorSelector extends DrawComponent{
 				int y = e.getY();
 				
 				if (isClearButton(x, y)){
-					ScreenManager.getDrawArea().clear();
+					ScreenManager.getManager().getDrawArea().clear();
 					return;
 				}
 				

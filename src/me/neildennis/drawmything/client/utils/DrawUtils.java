@@ -1,11 +1,10 @@
-package me.neildennis.drawmything.utils;
+package me.neildennis.drawmything.client.utils;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferInt;
-import java.util.ArrayList;
 
 public class DrawUtils {
 
@@ -115,6 +114,39 @@ public class DrawUtils {
 						pixels[realpos] = pix[fakepos];
 			}
 		}
+	}
+
+	public static void antiAlias(int radius, BufferedImage image, int x, int y, Color color, boolean background){
+		Graphics2D g = image.createGraphics();
+
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+		if (background){
+			g.setColor(Color.WHITE);
+			g.fillRect(0, 0, image.getWidth(), image.getHeight());
+		}
+
+		g.setColor(color);
+		g.fillOval(x - radius, y - radius, radius * 2, radius * 2);
+
+		g.dispose();
+	}
+
+	public static void antiAliasBorder(int radius, int stroke, BufferedImage image, int x, int y, Color color, boolean background){
+		Graphics2D g = image.createGraphics();
+
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+		if (background){
+			g.setColor(Color.WHITE);
+			g.fillRect(0, 0, image.getWidth(), image.getHeight());
+		}
+
+		g.setColor(color);
+		g.setStroke(new BasicStroke(stroke));
+		g.drawOval(x - radius, y - radius, radius * 2, radius * 2);
+
+		g.dispose();
 	}
 
 	public static boolean hasColor(int i){

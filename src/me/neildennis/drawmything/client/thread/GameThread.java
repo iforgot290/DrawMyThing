@@ -1,13 +1,16 @@
-package me.neildennis.drawmything.thread;
+package me.neildennis.drawmything.client.thread;
+
+import static me.neildennis.drawmything.client.utils.DrawUtils.*;
 
 import java.awt.Color;
 import java.awt.geom.Line2D;
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import me.neildennis.drawmything.Main;
-import me.neildennis.drawmything.screen.DrawArea;
-import me.neildennis.drawmything.screen.ScreenManager;
-import static me.neildennis.drawmything.utils.DrawUtils.*;
+import me.neildennis.drawmything.client.Main;
+import me.neildennis.drawmything.client.game.Player;
+import me.neildennis.drawmything.client.screen.DrawArea;
+import me.neildennis.drawmything.client.screen.ScreenManager;
 
 public class GameThread extends Thread{
 
@@ -18,32 +21,35 @@ public class GameThread extends Thread{
 	private boolean running = true;
 
 	private Color color = Color.BLACK;
-	private int stroke = 2;
+	private volatile int stroke = 2;
+	
+	private volatile ArrayList<Player> players;
 
 	public GameThread(){
 		main = Main.getMain();
 		lines = new ConcurrentLinkedQueue<Line2D>();
+		players = new ArrayList<Player>();
 		start();
 	}
 
 	public void run(){
 
-		while (!ScreenManager.isEnabled()) {
-			try {
-				Thread.sleep(1L);
-			} catch (InterruptedException e1) {
-				e1.printStackTrace();
-			}
-		}
-
 		main.log("Starting game thread");
 
-		drawarea = ScreenManager.getDrawArea();
-
+		drawarea = ScreenManager.getManager().getDrawArea();
+		
 		while (running){
 			handleLines();
 		}
 
+	}
+	
+	public ArrayList<Player> getPlayers(){
+		return players;
+	}
+	
+	public boolean isRunning(){
+		return true;
 	}
 
 	private void handleLines(){
@@ -98,7 +104,7 @@ public class GameThread extends Thread{
 		}
 	}
 
-	public synchronized void queueLine(Line2D line){
+	public void queueLine(Line2D line){
 		lines.offer(line);
 	}
 
@@ -108,6 +114,14 @@ public class GameThread extends Thread{
 	
 	public void setStroke(int stroke){
 		this.stroke = stroke;
+	}
+
+	public int getStroke() {
+		return stroke;
+	}
+
+	public Color getColor() {
+		return color;
 	}
 
 }

@@ -1,9 +1,10 @@
-package me.neildennis.drawmything.thread;
+package me.neildennis.drawmything.client.thread;
 
 import javax.swing.JFrame;
-import me.neildennis.drawmything.Main;
-import me.neildennis.drawmything.screen.DrawComponent;
-import me.neildennis.drawmything.screen.ScreenManager;
+
+import me.neildennis.drawmything.client.Main;
+import me.neildennis.drawmything.client.screen.DrawComponent;
+import me.neildennis.drawmything.client.screen.ScreenManager;
 
 public class GraphicsThread extends Thread{
 	
@@ -27,6 +28,8 @@ public class GraphicsThread extends Thread{
 		
 		ScreenManager.init(frame);
 		
+		for (DrawComponent c : ScreenManager.getManager().getComponents()) c.init();
+		
 		long lastTime = System.nanoTime();
 		double delta = 0.0;
 		double ns = 1000000000.0 / 60.0;
@@ -40,12 +43,12 @@ public class GraphicsThread extends Thread{
 			lastTime = now;
 			
 			if (delta >= 1.0) {
-				for (DrawComponent c : ScreenManager.getComponents()) c.update();
+				for (DrawComponent c : ScreenManager.getManager().getComponents()) c.tick();
 				updates++;
 				delta--;
 			}
 			
-			for (DrawComponent c : ScreenManager.getComponents()) c.render();
+			for (DrawComponent c : ScreenManager.getManager().getComponents()) c.render();
 			
 			frames++;
 			if (System.currentTimeMillis() - timer > 1000) {

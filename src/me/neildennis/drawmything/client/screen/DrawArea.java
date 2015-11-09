@@ -15,6 +15,8 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 
 import me.neildennis.drawmything.client.Main;
+import me.neildennis.drawmything.client.thread.DrawThread;
+import me.neildennis.drawmything.client.thread.GameThread;
 import me.neildennis.drawmything.client.utils.ChatUtils;
 import me.neildennis.drawmything.client.utils.FileUtils;
 
@@ -22,6 +24,8 @@ public class DrawArea extends DrawComponent{
 
 	private static final long serialVersionUID = 1L;
 	private Main main;
+	private GameThread game;
+	private DrawThread drawthread;
 
 	private BufferStrategy bs;
 	private Graphics2D g;
@@ -55,6 +59,8 @@ public class DrawArea extends DrawComponent{
 
 	public DrawArea(int width, int height){
 		main = Main.getMain();
+		game = main.getGameThread();
+		drawthread = main.getDrawThread();
 
 		this.height = height;
 		this.width = width;
@@ -79,8 +85,8 @@ public class DrawArea extends DrawComponent{
 
 		g.drawImage(image, 0, 0, width, height, null);
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		int stroke = main.getGameThread().getStroke();
-		g.setColor(main.getGameThread().getColor());
+		int stroke = game.getStroke();
+		g.setColor(game.getColor());
 		if (mousex != -1 && mousey != -1)
 			g.fillOval(mousex - stroke, mousey - stroke, stroke * 2, stroke * 2);
 
@@ -160,6 +166,12 @@ public class DrawArea extends DrawComponent{
 			pixels[i] = Color.WHITE.hashCode();
 		}
 	}
+	
+	private void draw(double oldx, double oldy, double currentx, double currenty){
+		Line2D line = new Line2D.Double(oldx, oldy, currentx, currenty);
+		game.queueLine(line);
+		drawthread.send(line, game.getColor(), game.getStroke());
+	}
 
 	private void registerClicks(){
 
@@ -171,7 +183,7 @@ public class DrawArea extends DrawComponent{
 				oldy = e.getY();
 
 				if (e.getButton()==1)
-					main.getGameThread().queueLine(new Line2D.Double(oldx, oldy, oldx, oldy));
+					draw(oldx, oldy, oldx, oldy);
 			}
 
 			@Override
@@ -205,8 +217,8 @@ public class DrawArea extends DrawComponent{
 				int currenty = e.getY();
 
 				if (currentx > getWidth() || currenty > getWidth() || currentx < 0 || currenty < 0) return;
-
-				main.getGameThread().queueLine(new Line2D.Double(oldx, oldy, currentx, currenty));
+				
+				draw(oldx, oldy, currentx, currenty);
 
 				oldx = currentx;
 				oldy = currenty;

@@ -20,8 +20,9 @@ public class GameThread extends Thread{
 	private ConcurrentLinkedQueue<Line2D> lines;
 	private boolean running = true;
 
-	private Color color = Color.BLACK;
+	private volatile Color color = Color.BLACK;
 	private volatile int stroke = 2;
+	private volatile boolean candraw = true;
 	
 	private volatile ArrayList<Player> players;
 
@@ -122,6 +123,10 @@ public class GameThread extends Thread{
 
 	public Color getColor() {
 		return color;
+	}
+	
+	public boolean canDraw(){
+		return candraw;
 	}
 
 }

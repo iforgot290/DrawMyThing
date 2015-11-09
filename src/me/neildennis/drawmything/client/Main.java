@@ -1,24 +1,21 @@
 package me.neildennis.drawmything.client;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferInt;
 import java.io.File;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.DatagramSocket;
 import java.net.Socket;
 
-import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
+import me.neildennis.drawmything.client.thread.DrawThread;
 import me.neildennis.drawmything.client.thread.GameThread;
 import me.neildennis.drawmything.client.thread.GraphicsThread;
 import me.neildennis.drawmything.client.thread.NetworkThread;
-import me.neildennis.drawmything.client.utils.FileUtils;
 import me.neildennis.drawmything.server.packets.ConnectPacket;
 import me.neildennis.drawmything.server.packets.Packet;
 import me.neildennis.drawmything.server.packets.Packet.PacketType;
-import me.neildennis.drawmything.server.packets.PicturePacket;
 
 public class Main{
 
@@ -27,6 +24,7 @@ public class Main{
 	private GraphicsThread gfxthread;
 	private GameThread gamethread;
 	private NetworkThread netthread;
+	private DrawThread drawthread;
 
 	private String username;
 	private Socket socket;
@@ -37,15 +35,15 @@ public class Main{
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		File config = new File(System.getenv("APPDATA")+"/DrawMyThing/config.txt");
-		
+
 		if (config.exists()){
-			
+
 		} else {
-			
+
 		}
-		
+
 		username = JOptionPane.showInputDialog(null, "Enter an username", "test");
 		//username = "Neil";
 		if (username == null || username.equals("")){
@@ -69,32 +67,34 @@ public class Main{
 		try {
 			gfxthread = new GraphicsThread();
 			gamethread = new GameThread();
-			
+
 			socket = new Socket("127.0.0.1", 8080);
-			
+
 			ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
 			oos.writeObject(new ConnectPacket(true, username));
-			
+
 			ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
 			ConnectPacket cp = (ConnectPacket)ois.readObject();
-			
+
 			if (cp.isConnecting()){
 				/*oos = new ObjectOutputStream(socket.getOutputStream());
 				BufferedImage image = ImageIO.read(new File(FileUtils.loadSkypePic()));
 				PicturePacket pp = new PicturePacket(((DataBufferInt)image.getRaster().getDataBuffer()).getData(), image.getWidth(), image.getHeight());
 				oos.writeObject(pp);*/
-				
+
 				boolean connecting = true;
-				
+
 				while (connecting){
 					ois = new ObjectInputStream(socket.getInputStream());
 					Packet packet = (Packet) ois.readObject();
-					
+
 					if (packet.getType()==PacketType.PLAYERINFO){
 						//handle
 					} else {
-						netthread = new NetworkThread(socket);
 						connecting = false;
+
+						netthread = new NetworkThread(socket);
+						drawthread = new DrawThread(new DatagramSocket(8080));
 					}
 				}
 			} else {
@@ -119,9 +119,13 @@ public class Main{
 	public GameThread getGameThread(){
 		return gamethread;
 	}
-	
+
 	public NetworkThread getNetworkThread(){
 		return netthread;
+	}
+	
+	public DrawThread getDrawThread(){
+		return drawthread;
 	}
 
 	public String getUsername() {

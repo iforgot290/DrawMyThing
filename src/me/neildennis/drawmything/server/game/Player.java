@@ -53,6 +53,10 @@ public class Player {
 	public Send getSend(){
 		return send;
 	}
+	
+	public synchronized Socket getSocket(){
+		return socket;
+	}
 
 	public BufferedImage getPic(){
 		return pic;

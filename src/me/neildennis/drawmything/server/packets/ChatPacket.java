@@ -1,5 +1,7 @@
 package me.neildennis.drawmything.server.packets;
 
+import me.neildennis.drawmything.client.utils.ChatUtils;
+
 public class ChatPacket extends Packet {
 
 	private static final long serialVersionUID = -1325056563259932685L;
@@ -18,6 +20,10 @@ public class ChatPacket extends Packet {
 	
 	public String getMsg(){
 		return msg;
+	}
+	
+	public void handle(){
+		ChatUtils.chat(msg, name);
 	}
 	
 }

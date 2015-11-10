@@ -11,6 +11,8 @@ public abstract class Packet implements Serializable{
 		this.type = type;
 	}
 	
+	public abstract void handle();
+	
 	public PacketType getType(){
 		return type;
 	}

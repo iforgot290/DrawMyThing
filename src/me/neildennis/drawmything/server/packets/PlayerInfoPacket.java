@@ -23,5 +23,9 @@ public class PlayerInfoPacket extends Packet{
 	public String getName(){
 		return name;
 	}
+	
+	public void handle(){
+		
+	}
 
 }

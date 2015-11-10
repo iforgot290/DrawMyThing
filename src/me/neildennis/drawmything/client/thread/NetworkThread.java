@@ -5,6 +5,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import me.neildennis.drawmything.client.Main;
 import me.neildennis.drawmything.client.utils.ChatUtils;
@@ -15,30 +17,34 @@ public class NetworkThread{
 
 	private Socket socket;
 
-	private Accept accept;
+	private ExecutorService execute;
 	private Send send;
 
 	private boolean running = true;
 
 	public NetworkThread(Socket socket){
 		this.socket = socket;
-		accept = new Accept();
-		send = new Send();
+
+		execute = Executors.newFixedThreadPool(2);
+		execute.execute(new Accept());
+		execute.execute(send = new Send());
 	}
 
 	public void send(Packet packet){
 		send.send(packet);
 	}
 
-	public class Accept extends Thread{
+	public void kill() throws IOException{
+		running = false;
+		socket.close();
+		execute.shutdownNow();
+	}
 
-		private Accept(){
-			start();
-		}
-		
+	public class Accept implements Runnable {
+
 		public void run(){
 			ObjectInputStream ois;
-			
+
 			while (running){
 				try {
 					ois = new ObjectInputStream(socket.getInputStream());
@@ -50,33 +56,32 @@ public class NetworkThread{
 				}
 			}
 		}
-		
+
 		private void handlePacket(Packet packet){
 			switch(packet.getType()){
-			
+
 			case CONNECT:
 				break;
-				
+
 			case CHAT:
 				ChatPacket cp = (ChatPacket)packet;
 				ChatUtils.chat(cp.getMsg(), cp.getName());
 				break;
-			
+
 			default:
 				break;
-			
+
 			}
 		}
 
 	}
 
-	public class Send extends Thread{
+	public class Send implements Runnable{
 
 		private ConcurrentLinkedQueue<Packet> queue;
 
 		private Send(){
 			queue = new ConcurrentLinkedQueue<Packet>();
-			start();
 		}
 
 		public void run(){

@@ -3,9 +3,8 @@ package me.neildennis.drawmything.server.thread;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
-import me.neildennis.drawmything.server.game.Player;
 
 public class DrawBroadcastThread {
 	
@@ -15,6 +14,9 @@ public class DrawBroadcastThread {
 	private DatagramSocket socket;
 	private Accept accept;
 	private Send send;
+	
+	private long lastcache = 0;
+	private InetAddress[] ips;
 	
 	public DrawBroadcastThread(DatagramSocket socket){
 		game = GameThread.getThread();
@@ -36,6 +38,16 @@ public class DrawBroadcastThread {
 	
 	private void send(DatagramPacket packet){
 		send.queue.offer(packet);
+	}
+	
+	private InetAddress[] getAddresses(){
+		if (System.currentTimeMillis() - lastcache >= 1000){
+			lastcache = System.currentTimeMillis();
+			ips = game.getAddresses();
+			return ips;
+		} else {
+			return ips;
+		}
 	}
 	
 	private class Accept extends Thread {
@@ -73,9 +85,9 @@ public class DrawBroadcastThread {
 		public void run(){
 			DatagramPacket packet;
 			while (running){
-				for (Player player : game.getPlayers()){
+				for (InetAddress address : getAddresses()){
 					packet = queue.poll();
-					packet.setAddress(player.getSocket().getInetAddress());
+					packet.setAddress(address);
 					packet.setPort(8080);
 					try {
 						socket.send(packet);

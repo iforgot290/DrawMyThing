@@ -17,5 +17,9 @@ public class PicturePacket extends Packet{
 	public int[] getImage(){
 		return image;
 	}
+	
+	public void handle(){
+		
+	}
 
 }

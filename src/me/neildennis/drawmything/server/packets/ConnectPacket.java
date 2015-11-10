@@ -19,5 +19,9 @@ public class ConnectPacket extends Packet {
 	public String getData(){
 		return data;
 	}
+	
+	public void handle(){
+		
+	}
 
 }

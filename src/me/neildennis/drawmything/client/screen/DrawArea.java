@@ -45,6 +45,7 @@ public class DrawArea extends DrawComponent{
 	private volatile double countmax = 0;
 	private volatile double last = 60;
 	
+	@SuppressWarnings("unused")
 	private boolean choosing = true;
 	private boolean drawing = true;
 	

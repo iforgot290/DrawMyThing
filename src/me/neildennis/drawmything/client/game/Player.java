@@ -17,6 +17,7 @@ import me.neildennis.drawmything.client.utils.ChatUtils;
 public class Player {
 
 	private Main main;
+	@SuppressWarnings("unused")
 	private GameThread game;
 
 	private String username;

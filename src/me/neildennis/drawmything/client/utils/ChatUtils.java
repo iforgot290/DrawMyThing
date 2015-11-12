@@ -5,7 +5,6 @@ import java.awt.Rectangle;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 
-import me.neildennis.drawmything.client.Main;
 import me.neildennis.drawmything.client.screen.ScreenManager;
 
 public class ChatUtils {

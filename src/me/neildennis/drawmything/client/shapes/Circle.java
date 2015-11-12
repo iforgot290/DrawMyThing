@@ -2,14 +2,12 @@ package me.neildennis.drawmything.client.shapes;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferInt;
 
 import me.neildennis.drawmything.client.utils.DrawUtils;
 
 public class Circle {
 
 	private BufferedImage image;
-	private int[] pixels;
 	
 	private Color color;
 	private int width, height;
@@ -30,7 +28,6 @@ public class Circle {
 		this.radius = radius;
 		
 		image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-		pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
 		
 		if (color == Color.WHITE)
 			DrawUtils.antiAliasBorder(radius, 1, image, (int) (width/2), (int) (height/2), Color.BLACK, true);

@@ -1,7 +1,10 @@
 package me.neildennis.drawmything.server.game;
 
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
 import java.awt.image.DataBufferInt;
+import java.awt.image.Raster;
+import java.awt.image.WritableRaster;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -9,7 +12,6 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import me.neildennis.drawmything.client.Main;
 import me.neildennis.drawmything.server.DrawServer;
 import me.neildennis.drawmything.server.packets.ChatPacket;
 import me.neildennis.drawmything.server.packets.Packet;
@@ -36,9 +38,11 @@ public class Player {
 	}
 
 	public void setPic(int[] image, int width, int height){
-		pic = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-		int [] img = ((DataBufferInt)pic.getRaster().getDataBuffer()).getData();
-		img = image;
+		DataBufferInt buffer = new DataBufferInt(image, image.length);
+		int[] bandMasks = {0xFF0000, 0xFF00, 0xFF, 0xFF000000};
+		WritableRaster raster = Raster.createPackedRaster(buffer, width, height, width, bandMasks, null);
+		ColorModel cm = ColorModel.getRGBdefault();
+		pic = new BufferedImage(cm, raster, cm.isAlphaPremultiplied(), null);
 	}
 
 	public void init(){

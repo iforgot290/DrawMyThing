@@ -64,7 +64,7 @@ public class Main{
 		}
 	}
 
-	public void log(Object str) {
+	public void log(Object str){
 		System.out.println("[" + Thread.currentThread().getName()+"] "+str);
 	}
 

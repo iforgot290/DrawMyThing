@@ -49,6 +49,10 @@ public class DrawServer {
 		return serversock;
 	}
 	
+	public ConnectThread getConnect(){
+		return connect;
+	}
+	
 	public void broadcast(Packet packet){
 		for (Player player : game.getPlayers())
 			player.sendPacket(packet);

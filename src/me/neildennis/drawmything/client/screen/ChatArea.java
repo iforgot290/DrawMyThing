@@ -19,6 +19,7 @@ import java.awt.image.DataBufferInt;
 import java.util.ArrayList;
 
 import me.neildennis.drawmything.client.Main;
+import me.neildennis.drawmything.client.managers.Manager;
 import me.neildennis.drawmything.server.packets.ChatPacket;
 
 public class ChatArea extends DrawComponent{
@@ -188,7 +189,7 @@ public class ChatArea extends DrawComponent{
 			public void keyReleased(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_ENTER && sb.length() > 0){
 					chat(main.getUsername()+": "+sb.toString());
-					main.getNetworkThread().send(new ChatPacket(sb.toString(), main.getUsername()));
+					Manager.getNetworkManager().send(new ChatPacket(sb.toString(), main.getUsername()));
 					sb = new StringBuilder();
 				}
 			}

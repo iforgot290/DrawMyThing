@@ -15,7 +15,8 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 
 import me.neildennis.drawmything.client.Main;
-import me.neildennis.drawmything.client.thread.DrawThread;
+import me.neildennis.drawmything.client.managers.Manager;
+import me.neildennis.drawmything.client.managers.NetworkManager;
 import me.neildennis.drawmything.client.thread.GameThread;
 import me.neildennis.drawmything.client.utils.ChatUtils;
 import me.neildennis.drawmything.client.utils.FileUtils;
@@ -25,7 +26,7 @@ public class DrawArea extends DrawComponent{
 	private static final long serialVersionUID = 1L;
 	private Main main;
 	private GameThread game;
-	private DrawThread drawthread;
+	private NetworkManager network;
 
 	private BufferStrategy bs;
 	private Graphics2D g;
@@ -60,7 +61,7 @@ public class DrawArea extends DrawComponent{
 	public DrawArea(int width, int height){
 		main = Main.getMain();
 		game = main.getGameThread();
-		drawthread = main.getDrawThread();
+		network = Manager.getNetworkManager();
 
 		this.height = height;
 		this.width = width;
@@ -170,7 +171,7 @@ public class DrawArea extends DrawComponent{
 	private void draw(double oldx, double oldy, double currentx, double currenty){
 		Line2D line = new Line2D.Double(oldx, oldy, currentx, currenty);
 		game.queueLine(line);
-		drawthread.send(line, game.getColor(), game.getStroke());
+		network.send(line, game.getColor(), game.getStroke());
 	}
 
 	private void registerClicks(){

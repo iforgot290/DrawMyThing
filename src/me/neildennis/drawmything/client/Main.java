@@ -1,22 +1,13 @@
 package me.neildennis.drawmything.client;
 
 import java.io.File;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.DatagramSocket;
-import java.net.Socket;
 
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
 import me.neildennis.drawmything.client.managers.Manager;
-import me.neildennis.drawmything.client.thread.DrawThread;
 import me.neildennis.drawmything.client.thread.GameThread;
 import me.neildennis.drawmything.client.thread.GraphicsThread;
-import me.neildennis.drawmything.client.thread.NetworkThread;
-import me.neildennis.drawmything.server.packets.ConnectPacket;
-import me.neildennis.drawmything.server.packets.Packet;
-import me.neildennis.drawmything.server.packets.Packet.PacketType;
 
 public class Main{
 
@@ -24,11 +15,8 @@ public class Main{
 
 	private GraphicsThread gfxthread;
 	private GameThread gamethread;
-	private NetworkThread netthread;
-	private DrawThread drawthread;
 
 	private String username;
-	private Socket socket;
 
 	private Main(){
 		try {
@@ -66,12 +54,9 @@ public class Main{
 
 	private void init(){
 		try {
+			Manager.init();
 			gfxthread = new GraphicsThread();
 			gamethread = new GameThread();
-
-			socket = new Socket("127.0.0.1", 8080);
-
-			Manager.init();
 		} catch (Exception e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -89,14 +74,6 @@ public class Main{
 
 	public GameThread getGameThread(){
 		return gamethread;
-	}
-
-	public NetworkThread getNetworkThread(){
-		return netthread;
-	}
-	
-	public DrawThread getDrawThread(){
-		return drawthread;
 	}
 
 	public String getUsername() {

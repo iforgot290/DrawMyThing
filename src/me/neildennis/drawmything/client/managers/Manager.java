@@ -1,19 +1,28 @@
 package me.neildennis.drawmything.client.managers;
 
+import java.io.IOException;
+import java.net.UnknownHostException;
+
 import me.neildennis.drawmything.client.exeptions.DrawException;
 
 public abstract class Manager {
-	
+
 	private static PacketManager packetman;
-	
+	private static NetworkManager networkman;
+
 	public abstract void shutdown() throws DrawException;
-	
+
 	public static PacketManager getPacketManager(){
 		return packetman;
 	}
 	
-	public static void init(){
-		packetman = new PacketManager();
+	public static NetworkManager getNetworkManager(){
+		return networkman;
 	}
-	
+
+	public static void init() throws UnknownHostException, ClassNotFoundException, IOException{
+		packetman = new PacketManager();
+		networkman = new NetworkManager("127.0.0.1", 8080);
+	}
+
 }

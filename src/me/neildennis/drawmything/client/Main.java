@@ -9,6 +9,7 @@ import java.net.Socket;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
+import me.neildennis.drawmything.client.managers.Manager;
 import me.neildennis.drawmything.client.thread.DrawThread;
 import me.neildennis.drawmything.client.thread.GameThread;
 import me.neildennis.drawmything.client.thread.GraphicsThread;
@@ -70,37 +71,7 @@ public class Main{
 
 			socket = new Socket("127.0.0.1", 8080);
 
-			ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
-			oos.writeObject(new ConnectPacket(true, username));
-
-			ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
-			ConnectPacket cp = (ConnectPacket)ois.readObject();
-
-			if (cp.isConnecting()){
-				/*oos = new ObjectOutputStream(socket.getOutputStream());
-				BufferedImage image = ImageIO.read(new File(FileUtils.loadSkypePic()));
-				PicturePacket pp = new PicturePacket(((DataBufferInt)image.getRaster().getDataBuffer()).getData(), image.getWidth(), image.getHeight());
-				oos.writeObject(pp);*/
-
-				boolean connecting = true;
-
-				while (connecting){
-					ois = new ObjectInputStream(socket.getInputStream());
-					Packet packet = (Packet) ois.readObject();
-
-					if (packet.getType()==PacketType.PLAYERINFO){
-						//handle
-					} else {
-						connecting = false;
-
-						netthread = new NetworkThread(socket);
-						drawthread = new DrawThread(new DatagramSocket(8080));
-					}
-				}
-			} else {
-				JOptionPane.showMessageDialog(null, cp.getData(), "Error", JOptionPane.ERROR_MESSAGE);
-				return;
-			}
+			Manager.init();
 		} catch (Exception e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);

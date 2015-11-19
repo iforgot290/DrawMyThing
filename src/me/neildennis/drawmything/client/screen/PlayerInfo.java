@@ -116,7 +116,7 @@ public class PlayerInfo extends DrawComponent{
 		if (pic==null&&retry)
 			try {
 				pic = ImageIO.read(new File(FileUtils.loadSkypePic()));
-			} catch (IOException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 				retry = false;
 			}

@@ -9,20 +9,20 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
 import me.neildennis.drawmything.client.Main;
 import me.neildennis.drawmything.client.game.Player;
-import me.neildennis.drawmything.client.thread.GameThread;
+import me.neildennis.drawmything.client.managers.GameManager;
+import me.neildennis.drawmything.client.managers.Manager;
 import me.neildennis.drawmything.client.utils.FileUtils;
 
 public class PlayerInfo extends DrawComponent{
 
 	private static final long serialVersionUID = 1L;
 	private Main main;
-	private GameThread game;
+	private GameManager game;
 	
 	public int width, height;
 	
@@ -42,7 +42,7 @@ public class PlayerInfo extends DrawComponent{
 
 	public PlayerInfo(int width, int height){
 		main = Main.getMain();
-		game = main.getGameThread();
+		game = Manager.getGameManager();
 		this.width = width;
 		this.height = height;
 		this.setPreferredSize(new Dimension(width, height));

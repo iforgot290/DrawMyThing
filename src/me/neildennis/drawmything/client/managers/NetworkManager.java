@@ -16,7 +16,6 @@ import java.util.concurrent.Executors;
 
 import me.neildennis.drawmything.client.Main;
 import me.neildennis.drawmything.client.exeptions.DrawException;
-import me.neildennis.drawmything.client.thread.GameThread;
 import me.neildennis.drawmything.server.packets.ConnectPacket;
 import me.neildennis.drawmything.server.packets.Packet;
 import me.neildennis.drawmything.server.packets.Packet.PacketType;
@@ -28,11 +27,11 @@ public class NetworkManager extends Manager{
 	private Socket tcpsocket;
 	private DatagramSocket udpsocket;
 	private PacketManager pman;
-	private GameThread game;
-	
+	private GameManager game;
+
 	private String host;
 	private int port;
-	
+
 	private TcpSend tcp;
 	private UdpSend udp;
 
@@ -42,8 +41,7 @@ public class NetworkManager extends Manager{
 		tcpsocket = new Socket(host, port);
 		udpsocket = new DatagramSocket(port);
 		pman = Manager.getPacketManager();
-		game = Main.getMain().getGameThread();
-		
+
 		connect();
 
 		service = Executors.newFixedThreadPool(4);
@@ -52,7 +50,7 @@ public class NetworkManager extends Manager{
 		service.execute(new UdpAccept());
 		service.execute(udp = new UdpSend());
 	}
-	
+
 	private void connect() throws IOException, ClassNotFoundException{
 		ObjectOutputStream oos = new ObjectOutputStream(tcpsocket.getOutputStream());
 		oos.writeObject(new ConnectPacket(true, Main.getMain().getUsername()));
@@ -78,11 +76,11 @@ public class NetworkManager extends Manager{
 	public void shutdown() throws DrawException {
 		service.shutdownNow();
 	}
-	
+
 	public void send(Packet packet){
 		tcp.queue.offer(packet);
 	}
-	
+
 	public void send(Line2D line, Color color, int stroke){
 		String strline = line.getX1()+":"+line.getY1()+":"+line.getX2()+":"+line.getY2()+":"+stroke+":"+color.hashCode();
 		try {
@@ -132,38 +130,47 @@ public class NetworkManager extends Manager{
 			}
 		}
 	}
-	
+
 	private class UdpAccept implements Runnable{
-		
+
 		private byte[] buffer;
 		private DatagramPacket packet;
-		
+
 		public void run(){
 			while (!Thread.currentThread().isInterrupted()){
 				buffer = new byte[100];
 				packet = new DatagramPacket(buffer, buffer.length);
-				try {
-					udpsocket.receive(packet);
-					String[] args = packet.getData().toString().split(":");
-					Line2D line = new Line2D.Double(Double.parseDouble(args[0]), Double.parseDouble(args[1]), Double.parseDouble(args[2]), Double.parseDouble(args[3]));
-					game.setStroke(Integer.valueOf(args[4]));
-					game.setDrawColor(new Color(Integer.valueOf(args[5])));
-					game.queueLine(line);
-				} catch (IOException e) {
-					e.printStackTrace();
+				if (game != null){
+					try {
+						udpsocket.receive(packet);
+						String[] args = packet.getData().toString().split(":");
+						Line2D line = new Line2D.Double(Double.parseDouble(args[0]), Double.parseDouble(args[1]), Double.parseDouble(args[2]), Double.parseDouble(args[3]));
+						game.setStroke(Integer.valueOf(args[4]));
+						game.setDrawColor(new Color(Integer.valueOf(args[5])));
+						game.queueLine(line);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				} else {
+					game = Manager.getGameManager();
+					try {
+						Thread.sleep(5L);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
 				}
 			}
 		}
 	}
-	
+
 	private class UdpSend implements Runnable{
-		
+
 		private ConcurrentLinkedQueue<DatagramPacket> queue;
-		
+
 		private UdpSend(){
 			queue = new ConcurrentLinkedQueue<DatagramPacket>();
 		}
-		
+
 		public void run(){
 			while (!Thread.currentThread().isInterrupted()){
 				if (!queue.isEmpty()){
@@ -175,7 +182,7 @@ public class NetworkManager extends Manager{
 				}
 			}
 		}
-		
+
 	}
 
 }

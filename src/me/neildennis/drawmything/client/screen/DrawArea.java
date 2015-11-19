@@ -14,18 +14,16 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 
-import me.neildennis.drawmything.client.Main;
+import me.neildennis.drawmything.client.managers.GameManager;
 import me.neildennis.drawmything.client.managers.Manager;
 import me.neildennis.drawmything.client.managers.NetworkManager;
-import me.neildennis.drawmything.client.thread.GameThread;
 import me.neildennis.drawmything.client.utils.ChatUtils;
 import me.neildennis.drawmything.client.utils.FileUtils;
 
 public class DrawArea extends DrawComponent{
 
 	private static final long serialVersionUID = 1L;
-	private Main main;
-	private GameThread game;
+	private GameManager game;
 	private NetworkManager network;
 
 	private BufferStrategy bs;
@@ -60,8 +58,7 @@ public class DrawArea extends DrawComponent{
 	}
 
 	public DrawArea(int width, int height){
-		main = Main.getMain();
-		game = main.getGameThread();
+		game = Manager.getGameManager();
 		network = Manager.getNetworkManager();
 
 		this.height = height;

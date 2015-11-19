@@ -9,14 +9,13 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 
-import me.neildennis.drawmything.client.Main;
+import me.neildennis.drawmything.client.managers.Manager;
 import me.neildennis.drawmything.client.shapes.Circle;
 import me.neildennis.drawmything.client.utils.FileUtils;
 
 public class ColorSelector extends DrawComponent{
 
 	private static final long serialVersionUID = 1L;
-	private Main main;
 	
 	private int width, height;
 	private int btnoffset = 0;
@@ -49,8 +48,6 @@ public class ColorSelector extends DrawComponent{
 	}
 
 	public ColorSelector(int width, int height){
-		main = Main.getMain();
-		
 		this.width = width;
 		this.height = height;
 		this.setSize(new Dimension(width, height));
@@ -112,13 +109,13 @@ public class ColorSelector extends DrawComponent{
 				
 				Color color = getColorClicked(x, y);
 				if (color != null){
-					main.getGameThread().setDrawColor(color);
+					Manager.getGameManager().setDrawColor(color);
 					return;
 				}
 				
 				int stroke = getStrokeClicked(x, y);
 				if (stroke > 0) {
-					main.getGameThread().setStroke(stroke);
+					Manager.getGameManager().setStroke(stroke);
 					return;
 				}
 			}

@@ -6,7 +6,6 @@ import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
 import me.neildennis.drawmything.client.managers.Manager;
-import me.neildennis.drawmything.client.thread.GameThread;
 import me.neildennis.drawmything.client.thread.GraphicsThread;
 
 public class Main{
@@ -14,7 +13,6 @@ public class Main{
 	private static Main main;
 
 	private GraphicsThread gfxthread;
-	private GameThread gamethread;
 
 	private String username;
 
@@ -56,7 +54,6 @@ public class Main{
 		try {
 			Manager.init();
 			gfxthread = new GraphicsThread();
-			gamethread = new GameThread();
 		} catch (Exception e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -70,10 +67,6 @@ public class Main{
 
 	public GraphicsThread getGfxThread(){
 		return gfxthread;
-	}
-
-	public GameThread getGameThread(){
-		return gamethread;
 	}
 
 	public String getUsername() {

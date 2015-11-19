@@ -1,6 +1,6 @@
-package me.neildennis.drawmything.client.thread;
+package me.neildennis.drawmything.client.managers;
 
-import static me.neildennis.drawmything.client.utils.DrawUtils.*;
+import static me.neildennis.drawmything.client.utils.DrawUtils.stroke;
 
 import java.awt.Color;
 import java.awt.geom.Line2D;
@@ -8,49 +8,83 @@ import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import me.neildennis.drawmything.client.Main;
+import me.neildennis.drawmything.client.exeptions.ShutdownException;
 import me.neildennis.drawmything.client.game.Player;
 import me.neildennis.drawmything.client.screen.DrawArea;
 import me.neildennis.drawmything.client.screen.ScreenManager;
 
-public class GameThread extends Thread{
+public class GameManager extends Manager implements Runnable{
 
 	private Main main;
 	private DrawArea drawarea;
+	private Thread process;
 
 	private ConcurrentLinkedQueue<Line2D> lines;
-	private boolean running = true;
 
 	private volatile Color color = Color.BLACK;
 	private volatile int stroke = 2;
 	private volatile boolean candraw = true;
-	
+
 	private volatile ArrayList<Player> players;
 
-	public GameThread(){
+	public GameManager(){
+		main.log("Game Manager starting...");
 		main = Main.getMain();
 		lines = new ConcurrentLinkedQueue<Line2D>();
 		players = new ArrayList<Player>();
-		start();
+		process = new Thread(this, "GameManager");
+		process.start();
 	}
 
+	@Override
+	public void shutdown(){
+		process.interrupt();
+		try { process.join(2000); } catch (InterruptedException e) { e.printStackTrace(); }
+		if (process.isAlive()) throw new ShutdownException("Thread still alive");
+	}
+
+	@Override
 	public void run(){
-
-		main.log("Starting game thread");
-
-		drawarea = ScreenManager.getManager().getDrawArea();
-		
-		while (running){
-			handleLines();
+		while (!process.isInterrupted()){
+			if (drawarea != null){
+				handleLines();
+			} else {
+				drawarea = ScreenManager.getManager().getDrawArea();
+				try {
+					Thread.sleep(5L);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
 		}
-
 	}
-	
+
 	public ArrayList<Player> getPlayers(){
 		return players;
 	}
-	
-	public boolean isRunning(){
-		return true;
+
+	public void queueLine(Line2D line){
+		lines.offer(line);
+	}
+
+	public void setDrawColor(Color color) {
+		this.color = color;
+	}
+
+	public void setStroke(int stroke){
+		this.stroke = stroke;
+	}
+
+	public int getStroke() {
+		return stroke;
+	}
+
+	public Color getColor() {
+		return color;
+	}
+
+	public boolean canDraw(){
+		return candraw;
 	}
 
 	private void handleLines(){
@@ -103,30 +137,6 @@ public class GameThread extends Thread{
 				}
 
 		}
-	}
-
-	public void queueLine(Line2D line){
-		lines.offer(line);
-	}
-
-	public void setDrawColor(Color color) {
-		this.color = color;
-	}
-	
-	public void setStroke(int stroke){
-		this.stroke = stroke;
-	}
-
-	public int getStroke() {
-		return stroke;
-	}
-
-	public Color getColor() {
-		return color;
-	}
-	
-	public boolean canDraw(){
-		return candraw;
 	}
 
 }

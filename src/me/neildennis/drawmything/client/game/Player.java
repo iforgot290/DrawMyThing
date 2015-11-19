@@ -9,16 +9,10 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
-import me.neildennis.drawmything.client.Main;
 import me.neildennis.drawmything.client.screen.ScreenManager;
-import me.neildennis.drawmything.client.thread.GameThread;
 import me.neildennis.drawmything.client.utils.ChatUtils;
 
 public class Player {
-
-	private Main main;
-	@SuppressWarnings("unused")
-	private GameThread game;
 
 	private String username;
 	private BufferedImage pic;
@@ -36,9 +30,6 @@ public class Player {
 	private int score;
 
 	public Player(String username){
-		main = Main.getMain();
-		game = main.getGameThread();
-
 		this.username = username;
 
 		Random random = new Random();

@@ -103,7 +103,7 @@ public class ColorSelector extends DrawComponent{
 				int y = e.getY();
 				
 				if (isClearButton(x, y)){
-					ScreenManager.getManager().getDrawArea().clear();
+					Manager.getScreen().getDrawArea().clear();
 					return;
 				}
 				

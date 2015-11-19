@@ -9,7 +9,7 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
-import me.neildennis.drawmything.client.screen.ScreenManager;
+import me.neildennis.drawmything.client.managers.Manager;
 import me.neildennis.drawmything.client.utils.ChatUtils;
 
 public class Player {
@@ -35,7 +35,7 @@ public class Player {
 		Random random = new Random();
 		score = random.nextInt(10);
 
-		panel = new BufferedImage(ScreenManager.getManager().getPlayerInfo().width - 20, 80, BufferedImage.TYPE_INT_RGB);
+		panel = new BufferedImage(Manager.getScreen().getPlayerInfo().width - 20, 80, BufferedImage.TYPE_INT_RGB);
 	}
 
 	public String getUsername(){

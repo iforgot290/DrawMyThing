@@ -5,7 +5,7 @@ import java.awt.Rectangle;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 
-import me.neildennis.drawmything.client.screen.ScreenManager;
+import me.neildennis.drawmything.client.managers.Manager;
 
 public class ChatUtils {
 
@@ -17,9 +17,9 @@ public class ChatUtils {
 
 	public static void chat(String msg, String username){
 		if (username == null)
-			ScreenManager.getManager().getChat().chat(msg);
+			Manager.getScreen().getChat().chat(msg);
 		else
-			ScreenManager.getManager().getChat().chat(getPlayerColor(username) + ": " + msg);
+			Manager.getScreen().getChat().chat(getPlayerColor(username) + ": " + msg);
 	}
 
 	public static String getPlayerColor(String username) {

@@ -3,8 +3,9 @@ package me.neildennis.drawmything.client.thread;
 import javax.swing.JFrame;
 
 import me.neildennis.drawmything.client.Main;
+import me.neildennis.drawmything.client.managers.Manager;
+import me.neildennis.drawmything.client.managers.ScreenManager;
 import me.neildennis.drawmything.client.screen.DrawComponent;
-import me.neildennis.drawmything.client.screen.ScreenManager;
 
 public class GraphicsThread extends Thread{
 	
@@ -12,23 +13,17 @@ public class GraphicsThread extends Thread{
 	private boolean running = true;
 	
 	private JFrame frame;
+	private ScreenManager screen;
 	
 	public GraphicsThread(){
 		main = Main.getMain();
+		screen = Manager.getScreen();
+		frame = screen.getFrame();
 		start();
 	}
 	
 	public void run(){
 		main.log("Starting gfx thread");
-		
-		frame = new JFrame();
-		frame.setResizable(false);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setTitle("DrawMyThing");
-		
-		ScreenManager.init(frame);
-		
-		for (DrawComponent c : ScreenManager.getManager().getComponents()) c.init();
 		
 		long lastTime = System.nanoTime();
 		double delta = 0.0;
@@ -43,12 +38,12 @@ public class GraphicsThread extends Thread{
 			lastTime = now;
 			
 			if (delta >= 1.0) {
-				for (DrawComponent c : ScreenManager.getManager().getComponents()) c.tick();
+				for (DrawComponent c : screen.getComponents()) c.tick();
 				updates++;
 				delta--;
 			}
 			
-			for (DrawComponent c : ScreenManager.getManager().getComponents()) c.render();
+			for (DrawComponent c : screen.getComponents()) c.render();
 			
 			frames++;
 			if (System.currentTimeMillis() - timer > 1000) {

@@ -11,7 +11,6 @@ import me.neildennis.drawmything.client.Main;
 import me.neildennis.drawmything.client.exeptions.ShutdownException;
 import me.neildennis.drawmything.client.game.Player;
 import me.neildennis.drawmything.client.screen.DrawArea;
-import me.neildennis.drawmything.client.screen.ScreenManager;
 
 public class GameManager extends Manager implements Runnable{
 
@@ -49,7 +48,7 @@ public class GameManager extends Manager implements Runnable{
 			if (drawarea != null){
 				handleLines();
 			} else {
-				drawarea = ScreenManager.getManager().getDrawArea();
+				drawarea = Manager.getScreen().getDrawArea();
 				try {
 					Thread.sleep(5L);
 				} catch (InterruptedException e) {

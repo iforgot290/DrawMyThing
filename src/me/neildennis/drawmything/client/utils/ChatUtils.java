@@ -16,10 +16,12 @@ public class ChatUtils {
 	}
 
 	public static void chat(String msg, String username){
-		if (username == null)
-			Manager.getScreen().getChat().chat(msg);
-		else
-			Manager.getScreen().getChat().chat(getPlayerColor(username) + ": " + msg);
+		try {
+			if (username == null)
+				Manager.getScreen().getChat().chat(msg);
+			else
+				Manager.getScreen().getChat().chat(getPlayerColor(username) + ": " + msg);
+		} catch (Exception e) {}
 	}
 
 	public static String getPlayerColor(String username) {

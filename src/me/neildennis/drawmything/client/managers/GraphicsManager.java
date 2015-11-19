@@ -1,29 +1,29 @@
-package me.neildennis.drawmything.client.thread;
+package me.neildennis.drawmything.client.managers;
 
 import javax.swing.JFrame;
 
 import me.neildennis.drawmything.client.Main;
-import me.neildennis.drawmything.client.managers.Manager;
-import me.neildennis.drawmything.client.managers.ScreenManager;
+import me.neildennis.drawmything.client.exeptions.ShutdownException;
 import me.neildennis.drawmything.client.screen.DrawComponent;
 
-public class GraphicsThread extends Thread{
+public class GraphicsManager extends Manager implements Runnable{
 	
 	private Main main;
-	private boolean running = true;
+	private Thread process;
 	
 	private JFrame frame;
 	private ScreenManager screen;
 	
-	public GraphicsThread(){
+	protected GraphicsManager(){
 		main = Main.getMain();
 		screen = Manager.getScreen();
 		frame = screen.getFrame();
-		start();
+		process = new Thread(this, "GfxManager");
+		process.start();
 	}
 	
 	public void run(){
-		main.log("Starting gfx thread");
+		main.log("Starting gfx thread...");
 		
 		long lastTime = System.nanoTime();
 		double delta = 0.0;
@@ -32,7 +32,7 @@ public class GraphicsThread extends Thread{
 		int updates = 0;
 		int frames = 0;
 		
-		while (running){
+		while (!process.isInterrupted()){
 			long now = System.nanoTime();
 			delta += (now - lastTime) / ns;
 			lastTime = now;
@@ -57,8 +57,11 @@ public class GraphicsThread extends Thread{
 		main.log("Stopping gfx thread");
 	}
 	
-	public void kill(){
-		running = false;
+	@Override
+	public void shutdown(){
+		process.interrupt();
+		try { process.join(2000); } catch (InterruptedException e) { e.printStackTrace(); }
+		if (process.isAlive()) throw new ShutdownException("Thread still alive");
 	}
 
 }

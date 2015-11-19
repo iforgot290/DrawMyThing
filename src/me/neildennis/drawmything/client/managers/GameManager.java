@@ -27,8 +27,8 @@ public class GameManager extends Manager implements Runnable{
 	private volatile ArrayList<Player> players;
 
 	public GameManager(){
-		main.log("Game Manager starting...");
 		main = Main.getMain();
+		main.log("Game Manager starting...");
 		lines = new ConcurrentLinkedQueue<Line2D>();
 		players = new ArrayList<Player>();
 		process = new Thread(this, "GameManager");
@@ -45,15 +45,17 @@ public class GameManager extends Manager implements Runnable{
 	@Override
 	public void run(){
 		while (!process.isInterrupted()){
-			if (drawarea != null){
+			if (Manager.getScreen()!=null && drawarea != null){
 				handleLines();
 			} else {
-				drawarea = Manager.getScreen().getDrawArea();
 				try {
-					Thread.sleep(5L);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+					drawarea = Manager.getScreen().getDrawArea();
+					try {
+						Thread.sleep(5L);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				} catch (Exception e) {}
 			}
 		}
 	}

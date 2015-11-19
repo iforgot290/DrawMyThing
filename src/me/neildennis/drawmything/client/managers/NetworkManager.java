@@ -95,6 +95,8 @@ public class NetworkManager extends Manager{
 		private ObjectInputStream ois;
 
 		public void run(){
+			Thread.currentThread().setName("TcpAccept");
+			
 			while (!Thread.currentThread().isInterrupted()){
 				try {
 					ois = new ObjectInputStream(tcpsocket.getInputStream());
@@ -118,6 +120,8 @@ public class NetworkManager extends Manager{
 		}
 
 		public void run(){
+			Thread.currentThread().setName("TcpSend");
+			
 			while (!Thread.currentThread().isInterrupted()){
 				if (!queue.isEmpty()){
 					try {
@@ -137,6 +141,8 @@ public class NetworkManager extends Manager{
 		private DatagramPacket packet;
 
 		public void run(){
+			Thread.currentThread().setName("UdpAccept");
+			
 			while (!Thread.currentThread().isInterrupted()){
 				buffer = new byte[100];
 				packet = new DatagramPacket(buffer, buffer.length);
@@ -172,6 +178,8 @@ public class NetworkManager extends Manager{
 		}
 
 		public void run(){
+			Thread.currentThread().setName("UdpSend");
+			
 			while (!Thread.currentThread().isInterrupted()){
 				if (!queue.isEmpty()){
 					try {

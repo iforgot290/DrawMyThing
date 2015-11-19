@@ -10,7 +10,7 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 
 import me.neildennis.drawmything.client.managers.Manager;
-import me.neildennis.drawmything.client.shapes.Circle;
+import me.neildennis.drawmything.client.utils.DrawUtils;
 import me.neildennis.drawmything.client.utils.FileUtils;
 
 public class ColorSelector extends DrawComponent{
@@ -173,6 +173,69 @@ public class ColorSelector extends DrawComponent{
 		}
 		
 		return 0;
+	}
+	
+	private class Circle{
+		private BufferedImage image;
+		
+		private Color color;
+		private int width, height;
+		private int radius;
+
+		@SuppressWarnings("unused")
+		public Circle(int radius, Color color){
+			this(radius, radius * 2 + 5, radius * 2 + 5, color);
+		}
+
+		public Circle(int radius, int width, Color color){
+			this(radius, width, radius * 2 + 5, color);
+		}
+
+		public Circle(int radius, int width, int height, Color color){
+			this.width = width;
+			this.height = height;
+			this.color = color;
+			this.radius = radius;
+			
+			image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+			
+			if (color == Color.WHITE)
+				DrawUtils.antiAliasBorder(radius, 1, image, (int) (width/2), (int) (height/2), Color.BLACK, true);
+			else
+				DrawUtils.antiAlias(radius, image, (int) (width/2), (int) (height/2), color, true);
+		}
+
+		public BufferedImage getImage() {
+			return image;
+		}
+
+		@SuppressWarnings("unused")
+		public int getWidth() {
+			return width;
+		}
+
+		public int getHeight() {
+			return height;
+		}
+
+		public Color getColor() {
+			return color;
+		}
+
+		public void overlay(){
+			DrawUtils.antiAliasBorder(radius, 2, image, (int) (width / 2), (int) (height / 2), Color.BLACK, false);
+		}
+
+		public void reset(){
+			if (color == Color.WHITE)
+				DrawUtils.antiAliasBorder(radius, 1, image, (int) (width/2), (int) (height/2), Color.BLACK, true);
+			else
+				DrawUtils.antiAlias(radius, image, (int) (width/2), (int) (height/2), color, true);
+		}
+		
+		public void outline(){
+			DrawUtils.antiAliasBorder(radius, 1, image, (int) (width / 2), (int) (height / 2), color, true);
+		}
 	}
 
 }

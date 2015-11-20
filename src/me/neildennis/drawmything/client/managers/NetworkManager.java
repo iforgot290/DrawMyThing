@@ -10,6 +10,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -39,7 +40,7 @@ public class NetworkManager extends Manager{
 		this.host = host;
 		this.port = port;
 		tcpsocket = new Socket(host, port);
-		udpsocket = new DatagramSocket(port);
+		udpsocket = new DatagramSocket(8081);
 		pman = Manager.getPacketManager();
 
 		connect();
@@ -82,7 +83,7 @@ public class NetworkManager extends Manager{
 	}
 
 	public void send(Line2D line, Color color, int stroke){
-		String strline = line.getX1()+":"+line.getY1()+":"+line.getX2()+":"+line.getY2()+":"+stroke+":"+color.hashCode();
+		String strline = line.getX1()+":"+line.getY1()+":"+line.getX2()+":"+line.getY2()+":"+stroke+":"+color.getRGB()+":";
 		try {
 			udp.queue.offer(new DatagramPacket(strline.getBytes(), strline.getBytes().length, InetAddress.getByName(host), port));
 		} catch (UnknownHostException e) {
@@ -96,7 +97,7 @@ public class NetworkManager extends Manager{
 
 		public void run(){
 			Thread.currentThread().setName("TcpAccept");
-			
+
 			while (!Thread.currentThread().isInterrupted()){
 				try {
 					ois = new ObjectInputStream(tcpsocket.getInputStream());
@@ -121,7 +122,7 @@ public class NetworkManager extends Manager{
 
 		public void run(){
 			Thread.currentThread().setName("TcpSend");
-			
+
 			while (!Thread.currentThread().isInterrupted()){
 				if (!queue.isEmpty()){
 					try {
@@ -142,17 +143,22 @@ public class NetworkManager extends Manager{
 
 		public void run(){
 			Thread.currentThread().setName("UdpAccept");
-			
+
 			while (!Thread.currentThread().isInterrupted()){
 				buffer = new byte[100];
 				packet = new DatagramPacket(buffer, buffer.length);
 				if (game != null){
 					try {
 						udpsocket.receive(packet);
-						String[] args = packet.getData().toString().split(":");
+						String data = new String(packet.getData(), StandardCharsets.UTF_8);
+						String[] args = data.split(":");
 						Line2D line = new Line2D.Double(Double.parseDouble(args[0]), Double.parseDouble(args[1]), Double.parseDouble(args[2]), Double.parseDouble(args[3]));
 						game.setStroke(Integer.valueOf(args[4]));
-						game.setDrawColor(new Color(Integer.valueOf(args[5])));
+						try {
+							game.setDrawColor(new Color(Integer.valueOf(args[5])));
+						} catch (Exception e){
+							e.printStackTrace();
+						}
 						game.queueLine(line);
 					} catch (IOException e) {
 						e.printStackTrace();
@@ -179,7 +185,7 @@ public class NetworkManager extends Manager{
 
 		public void run(){
 			Thread.currentThread().setName("UdpSend");
-			
+
 			while (!Thread.currentThread().isInterrupted()){
 				if (!queue.isEmpty()){
 					try {

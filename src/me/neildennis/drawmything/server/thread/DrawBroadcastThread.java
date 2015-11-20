@@ -6,25 +6,28 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import me.neildennis.drawmything.server.DrawServer;
+
 public class DrawBroadcastThread {
-	
+
 	private boolean running = true;
 	private GameThread game;
-	
+
 	private DatagramSocket socket;
 	private Accept accept;
 	private Send send;
-	
+
 	private long lastcache = 0;
 	private InetAddress[] ips;
-	
+
 	public DrawBroadcastThread(DatagramSocket socket){
+		DrawServer.getServer().log("Enabling udp thread");
 		game = GameThread.getThread();
 		this.socket = socket;
 		send = new Send();
 		accept = new Accept();
 	}
-	
+
 	public void kill(){
 		running = false;
 		socket.close();
@@ -35,11 +38,11 @@ public class DrawBroadcastThread {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void send(DatagramPacket packet){
 		send.queue.offer(packet);
 	}
-	
+
 	private InetAddress[] getAddresses(){
 		if (System.currentTimeMillis() - lastcache >= 1000){
 			lastcache = System.currentTimeMillis();
@@ -49,13 +52,13 @@ public class DrawBroadcastThread {
 			return ips;
 		}
 	}
-	
+
 	private class Accept extends Thread {
-		
+
 		public Accept(){
 			start();
 		}
-		
+
 		public void run(){
 			DatagramPacket packet;
 			byte[] buffer;
@@ -70,34 +73,37 @@ public class DrawBroadcastThread {
 				}
 			}
 		}
-		
+
 	}
-	
+
 	private class Send extends Thread {
-		
+
 		private ConcurrentLinkedQueue<DatagramPacket> queue;
-		
+
 		private Send(){
 			queue = new ConcurrentLinkedQueue<DatagramPacket>();
 			start();
 		}
-		
+
 		public void run(){
+			Thread.currentThread().setName("UdpSend");
 			DatagramPacket packet;
 			while (running){
-				for (InetAddress address : getAddresses()){
+				if (!queue.isEmpty()){
 					packet = queue.poll();
-					packet.setAddress(address);
-					packet.setPort(8080);
-					try {
-						socket.send(packet);
-					} catch (IOException e) {
-						e.printStackTrace();
+					for (InetAddress address : getAddresses()){
+						packet.setAddress(address);
+						packet.setPort(8081);
+						try {
+							socket.send(packet);
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
 					}
 				}
 			}
 		}
-		
+
 	}
 
 }

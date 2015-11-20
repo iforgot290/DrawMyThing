@@ -1,11 +1,13 @@
 package me.neildennis.drawmything.server;
 
 import java.io.IOException;
+import java.net.DatagramSocket;
 import java.net.ServerSocket;
 
 import me.neildennis.drawmything.server.game.Player;
 import me.neildennis.drawmything.server.packets.Packet;
 import me.neildennis.drawmything.server.thread.ConnectThread;
+import me.neildennis.drawmything.server.thread.DrawBroadcastThread;
 import me.neildennis.drawmything.server.thread.GameThread;
 
 public class DrawServer {
@@ -14,15 +16,17 @@ public class DrawServer {
 	
 	private GameThread game;
 	private ConnectThread connect;
+	private DrawBroadcastThread udp;
 	
 	private ServerSocket serversock;
 	
 	public DrawServer(){
+		main = this;
 		init();
 	}
 	
 	public static void main(String[] args){
-		main = new DrawServer();
+		new DrawServer();
 	}
 	
 	public static DrawServer getServer(){
@@ -36,6 +40,7 @@ public class DrawServer {
 			
 			game = new GameThread();
 			connect = new ConnectThread(serversock);
+			udp = new DrawBroadcastThread(new DatagramSocket(8080));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

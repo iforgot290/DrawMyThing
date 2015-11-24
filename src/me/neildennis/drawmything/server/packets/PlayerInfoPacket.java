@@ -27,5 +27,9 @@ public class PlayerInfoPacket extends Packet{
 	public void handle(){
 		
 	}
+	
+	public void handleServer(Player player){
+
+	}
 
 }

@@ -2,6 +2,8 @@ package me.neildennis.drawmything.server.packets;
 
 import java.io.Serializable;
 
+import me.neildennis.drawmything.server.game.Player;
+
 public abstract class Packet implements Serializable{
 
 	private static final long serialVersionUID = 3359816311617999602L;
@@ -12,6 +14,7 @@ public abstract class Packet implements Serializable{
 	}
 	
 	public abstract void handle();
+	public abstract void handleServer(Player player);
 	
 	public PacketType getType(){
 		return type;

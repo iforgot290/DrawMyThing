@@ -27,7 +27,7 @@ public class ChatPacket extends Packet {
 		ChatUtils.chat(msg, name);
 	}
 
-	public void handleServer(Player player){
+	public void server(Player player){
 
 	}
 

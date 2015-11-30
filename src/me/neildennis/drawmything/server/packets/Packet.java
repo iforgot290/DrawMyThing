@@ -14,7 +14,7 @@ public abstract class Packet implements Serializable{
 	}
 	
 	public abstract void handle();
-	public abstract void handleServer(Player player);
+	public abstract void server(Player player);
 	
 	public PacketType getType(){
 		return type;

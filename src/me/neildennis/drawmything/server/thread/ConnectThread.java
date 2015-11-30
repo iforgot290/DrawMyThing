@@ -82,7 +82,7 @@ public class ConnectThread extends Thread{
 				
 				if (game.checkUsername(packet.getData())){
 					oos.writeObject(new ConnectPacket(true, ""));
-					Player player = new Player(packet.getData(), socket);
+					Player player = new Player(packet.getData(), socket, null, null);
 					
 					/*ois = new ObjectInputStream(socket.getInputStream());
 					PicturePacket picpack = (PicturePacket)ois.readObject();
@@ -101,7 +101,7 @@ public class ConnectThread extends Thread{
 					oos = new ObjectOutputStream(socket.getOutputStream());
 					oos.writeObject(new ConnectPacket(true, ""));
 					
-					player.init();
+					//player.init();
 					server.broadcast(new ChatPacket(player.getName() + " has joined the server", null));
 				}
 				

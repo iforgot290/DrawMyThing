@@ -5,6 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -13,7 +14,6 @@ import me.neildennis.drawmything.server.game.Player;
 import me.neildennis.drawmything.server.packets.ChatPacket;
 import me.neildennis.drawmything.server.packets.ConnectPacket;
 import me.neildennis.drawmything.server.packets.Packet;
-import me.neildennis.drawmything.server.packets.PlayerInfoPacket;
 import me.neildennis.drawmything.server.thread.GameThread;
 
 public class NetworkManager extends ServManager {
@@ -34,11 +34,16 @@ public class NetworkManager extends ServManager {
 		servsock = new ServerSocket(port);
 
 		service = Executors.newCachedThreadPool();
+		service.execute(new Connect());
 	}
 
 	@Override
 	public void shutdown() {
-
+		service.shutdownNow();
+	}
+	
+	public int getPort(){
+		return port;
 	}
 
 	private class Connect implements Runnable{
@@ -59,18 +64,16 @@ public class NetworkManager extends ServManager {
 
 	}
 
-	private class Accept implements Runnable{
+	public class Accept implements Runnable{
 
 		private Socket socket;
 		private Player player;
 		
 		private boolean accept;
-		private boolean connected;
 
 		private Accept(Socket socket, boolean accept){
 			this.socket = socket;
 			this.accept = accept;
-			this.connected = false;
 		}
 		
 		private void acceptPackets(){
@@ -81,7 +84,7 @@ public class NetworkManager extends ServManager {
 				try {
 					ois = new ObjectInputStream(socket.getInputStream());
 					Packet packet = (Packet) ois.readObject();
-					packet.handleServer(player);
+					packet.server(player);
 				} catch (IOException e) {
 					e.printStackTrace();
 				} catch (ClassNotFoundException e) {
@@ -109,29 +112,23 @@ public class NetworkManager extends ServManager {
 
 				if (game.checkUsername(packet.getData())){
 					oos.writeObject(new ConnectPacket(true, ""));
-					Player player = new Player(packet.getData(), socket);
+					player = new Player(packet.getData(), socket, new Send(socket, packet.getData()), this);
+					
+					Thread.currentThread().setName("Accept "+player.getName());
 
-					/*ois = new ObjectInputStream(socket.getInputStream());
-				PicturePacket picpack = (PicturePacket)ois.readObject();
-				player.setPic(picpack.getImage(), picpack.width, picpack.height);*/
-
-					game.addPlayer(player);
-
-					for (Player p : game.getPlayers()){
+					/*for (Player p : game.getPlayers()){
 						if (p != player){
 							PlayerInfoPacket pinfo = new PlayerInfoPacket(p);
 							oos = new ObjectOutputStream(socket.getOutputStream());
 							oos.writeObject(pinfo);
 						}
-					}
+					}*/
 
 					oos = new ObjectOutputStream(socket.getOutputStream());
 					oos.writeObject(new ConnectPacket(true, ""));
-
-					player.init();
-					this.player = player;
-					acceptPackets();
+					
 					server.broadcast(new ChatPacket(player.getName() + " has joined the server", null));
+					acceptPackets();
 				}
 
 				else {
@@ -145,7 +142,40 @@ public class NetworkManager extends ServManager {
 				e.printStackTrace();
 			}
 		}
-
+	}
+	
+	public class Send implements Runnable{
+		
+		private Socket socket;
+		private ConcurrentLinkedQueue<Packet> queue;
+		private String name;
+		
+		private Send(Socket socket, String name){
+			this.socket = socket;
+			this.name = name;
+		}
+		
+		@Override
+		public void run(){
+			Thread.currentThread().setName("Send "+name);
+			ObjectOutputStream oos;
+			
+			while(!Thread.currentThread().isInterrupted()){
+				if (!queue.isEmpty()){
+					try {
+						oos = new ObjectOutputStream(socket.getOutputStream());
+						oos.writeObject(queue.poll());
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		
+		public void send(Packet packet){
+			queue.add(packet);
+		}
+		
 	}
 
 }

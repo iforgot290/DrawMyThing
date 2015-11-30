@@ -5,35 +5,28 @@ import java.awt.image.ColorModel;
 import java.awt.image.DataBufferInt;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.net.SocketException;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import me.neildennis.drawmything.server.DrawServer;
-import me.neildennis.drawmything.server.packets.ChatPacket;
+import me.neildennis.drawmything.server.managers.NetworkManager.Accept;
+import me.neildennis.drawmything.server.managers.NetworkManager.Send;
 import me.neildennis.drawmything.server.packets.Packet;
 import me.neildennis.drawmything.server.thread.GameThread;
 
 public class Player {
 	
 	private GameThread game;
-	private DrawServer server;
-
+	
 	private Socket socket;
 	private Accept accept;
 	private Send send;
-	private boolean running = true;
 
 	private String username;
 	private BufferedImage pic;
 
-	public Player(String username, Socket socket){
+	public Player(String username, Socket socket, Send send, Accept accept){
 		this.socket = socket;
 		this.username = username;
-		server = DrawServer.getServer();
 		game = GameThread.getThread();
 	}
 
@@ -43,11 +36,6 @@ public class Player {
 		WritableRaster raster = Raster.createPackedRaster(buffer, width, height, width, bandMasks, null);
 		ColorModel cm = ColorModel.getRGBdefault();
 		pic = new BufferedImage(cm, raster, cm.isAlphaPremultiplied(), null);
-	}
-
-	public void init(){
-		accept = new Accept();
-		send = new Send();
 	}
 
 	public Accept getAccept(){
@@ -66,7 +54,7 @@ public class Player {
 		return pic;
 	}
 
-	public void sendPacket(Packet packet){
+	public void send(Packet packet){
 		send.send(packet);
 	}
 
@@ -74,13 +62,13 @@ public class Player {
 		return username;
 	}
 	
+	//TODO handle disconnects properly
 	public void disconnect(String msg){
 		DrawServer.getServer().log(username + " has disconnected: "+msg);
-		running = false;
 		game.removePlayer(this);
 	}
 
-	private class Accept extends Thread{
+	/*private class Accept extends Thread{
 
 		public Accept(){
 			start();
@@ -119,42 +107,6 @@ public class Player {
 			}
 		}
 
-	}
-
-	private class Send extends Thread{
-
-		private ConcurrentLinkedQueue<Packet> queue;
-
-		public Send(){
-			queue = new ConcurrentLinkedQueue<Packet>();
-			start();
-		}
-
-		public void run(){
-			ObjectOutputStream oos;
-
-			while (running){
-				try {
-					if (!queue.isEmpty()){
-						oos = new ObjectOutputStream(socket.getOutputStream());
-						oos.writeObject(queue.poll());
-					}
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
-
-				try {
-					Thread.sleep(1L);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-
-		public void send(Packet packet){
-			queue.offer(packet);
-		}
-
-	}
+	}*/
 
 }

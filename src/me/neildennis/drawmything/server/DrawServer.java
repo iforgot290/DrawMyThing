@@ -16,6 +16,7 @@ public class DrawServer {
 	
 	private GameThread game;
 	private ConnectThread connect;
+	@SuppressWarnings("unused")
 	private DrawBroadcastThread udp;
 	
 	private ServerSocket serversock;
@@ -60,13 +61,13 @@ public class DrawServer {
 	
 	public void broadcast(Packet packet){
 		for (Player player : game.getPlayers())
-			player.sendPacket(packet);
+			player.send(packet);
 	}
 	
 	public void broadcast(Packet packet, Player exclude){
 		for (Player player : game.getPlayers())
 			if (player != exclude)
-				player.sendPacket(packet);
+				player.send(packet);
 	}
 
 }

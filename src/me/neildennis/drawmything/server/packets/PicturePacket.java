@@ -24,7 +24,7 @@ public class PicturePacket extends Packet{
 		
 	}
 	
-	public void handleServer(Player player){
+	public void server(Player player){
 
 	}
 

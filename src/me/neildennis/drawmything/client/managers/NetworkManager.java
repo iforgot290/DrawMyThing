@@ -30,13 +30,13 @@ public class NetworkManager extends Manager{
 	private PacketManager pman;
 	private GameManager game;
 
-	private String host;
+	private InetAddress host;
 	private int port;
 
 	private TcpSend tcp;
 	private UdpSend udp;
 
-	protected NetworkManager(String host, int port) throws UnknownHostException, IOException, ClassNotFoundException{
+	protected NetworkManager(InetAddress host, int port) throws UnknownHostException, IOException, ClassNotFoundException{
 		this.host = host;
 		this.port = port;
 		tcpsocket = new Socket(host, port);
@@ -52,7 +52,7 @@ public class NetworkManager extends Manager{
 		service.execute(udp = new UdpSend());
 		
 		String hi = "hi";
-		udp.queue.offer(new DatagramPacket(hi.getBytes(), hi.getBytes().length, InetAddress.getByName(host), port));
+		udp.queue.offer(new DatagramPacket(hi.getBytes(), hi.getBytes().length, host, port));
 	}
 
 	private void connect() throws IOException, ClassNotFoundException{
@@ -78,6 +78,7 @@ public class NetworkManager extends Manager{
 
 	@Override
 	public void shutdown() throws DrawException {
+		udp.queue.offer(new DatagramPacket("bye".getBytes(), "bye".getBytes().length, host, port));
 		service.shutdownNow();
 	}
 
@@ -87,11 +88,7 @@ public class NetworkManager extends Manager{
 
 	public void send(Line2D line, Color color, int stroke){
 		String strline = line.getX1()+":"+line.getY1()+":"+line.getX2()+":"+line.getY2()+":"+stroke+":"+color.getRGB()+":";
-		try {
-			udp.queue.offer(new DatagramPacket(strline.getBytes(), strline.getBytes().length, InetAddress.getByName(host), port));
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		}
+		udp.queue.offer(new DatagramPacket(strline.getBytes(), strline.getBytes().length, host, port));
 	}
 
 	private class TcpAccept implements Runnable{
@@ -196,6 +193,14 @@ public class NetworkManager extends Manager{
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
+				}
+			}
+			
+			while (!queue.isEmpty()){
+				try {
+					udpsocket.send(queue.poll());
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
 			}
 		}

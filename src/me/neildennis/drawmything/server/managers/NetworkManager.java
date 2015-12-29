@@ -26,7 +26,7 @@ public class NetworkManager extends ServManager {
 	private DrawServer server;
 	private GameThread game;
 
-	public NetworkManager(int port) throws IOException{
+	protected NetworkManager(int port) throws IOException{
 		this.game = GameThread.getThread();
 		this.server = DrawServer.getServer();
 		
@@ -72,6 +72,7 @@ public class NetworkManager extends ServManager {
 		private Player player;
 		
 		private boolean accept;
+		private boolean running = true;
 
 		private Accept(Socket socket, boolean accept){
 			this.socket = socket;
@@ -82,17 +83,25 @@ public class NetworkManager extends ServManager {
 			Thread.currentThread().setName("Accept "+player.getName());
 			ObjectInputStream ois;
 			
-			while(!Thread.currentThread().isInterrupted()){
+			while(!Thread.currentThread().isInterrupted()&&running){
 				try {
 					ois = new ObjectInputStream(socket.getInputStream());
 					Packet packet = (Packet) ois.readObject();
 					packet.server(player);
 				} catch (IOException e) {
-					e.printStackTrace();
+					if (e.getMessage().contains("Connection reset")){
+						player.disconnect("Connection reset");
+					} else {
+						e.printStackTrace();
+					}
 				} catch (ClassNotFoundException e) {
 					e.printStackTrace();
 				}
 			}
+		}
+		
+		public void kill(){
+			running = false;
 		}
 
 		@Override
@@ -114,7 +123,9 @@ public class NetworkManager extends ServManager {
 
 				if (game.checkUsername(packet.getData())){
 					oos.writeObject(new ConnectPacket(true, ""));
-					player = new Player(packet.getData(), socket, new Send(socket, packet.getData()), this);
+					Send send = new Send(socket, packet.getData());
+					service.execute(send);
+					player = new Player(packet.getData(), socket, send, this);
 					
 					Thread.currentThread().setName("Accept "+player.getName());
 
@@ -128,7 +139,7 @@ public class NetworkManager extends ServManager {
 
 					oos = new ObjectOutputStream(socket.getOutputStream());
 					oos.writeObject(new ConnectPacket(true, ""));
-					
+					game.addPlayer(player);
 					server.broadcast(new ChatPacket(player.getName() + " has joined the server", null));
 					acceptPackets();
 				}
@@ -139,7 +150,11 @@ public class NetworkManager extends ServManager {
 					return;
 				}		
 			} catch (IOException e) {
-				e.printStackTrace();
+				if (e.getMessage().contains("Connection reset")){
+					player.disconnect("Connection reset");
+				} else {
+					e.printStackTrace();
+				}
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 			}
@@ -151,10 +166,12 @@ public class NetworkManager extends ServManager {
 		private Socket socket;
 		private ConcurrentLinkedQueue<Packet> queue;
 		private String name;
+		private boolean running = true;
 		
 		private Send(Socket socket, String name){
 			this.socket = socket;
 			this.name = name;
+			this.queue = new ConcurrentLinkedQueue<Packet>();
 		}
 		
 		@Override
@@ -162,7 +179,7 @@ public class NetworkManager extends ServManager {
 			Thread.currentThread().setName("Send "+name);
 			ObjectOutputStream oos;
 			
-			while(!Thread.currentThread().isInterrupted()){
+			while(!Thread.currentThread().isInterrupted()&&running){
 				if (!queue.isEmpty()){
 					try {
 						oos = new ObjectOutputStream(socket.getOutputStream());
@@ -172,6 +189,19 @@ public class NetworkManager extends ServManager {
 					}
 				}
 			}
+			
+			while (!queue.isEmpty()){
+				try {
+					oos = new ObjectOutputStream(socket.getOutputStream());
+					oos.writeObject(queue.poll());
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		public void kill(){
+			running = false;
 		}
 		
 		public void send(Packet packet){

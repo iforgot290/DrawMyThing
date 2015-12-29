@@ -68,47 +68,8 @@ public class Player {
 	public void disconnect(String msg){
 		DrawServer.log(username + " has disconnected: "+msg);
 		game.removePlayer(this);
+		accept.kill();
+		send.kill();
 	}
-
-	/*private class Accept extends Thread{
-
-		public Accept(){
-			start();
-		}
-
-		public void run(){
-			ObjectInputStream ois;
-			
-			while (running){
-				try {
-					ois = new ObjectInputStream(socket.getInputStream());
-					handlePacket((Packet) ois.readObject());
-				} catch (ClassNotFoundException e) {
-					e.printStackTrace();
-				}  catch (SocketException e){
-					disconnect(e.getMessage());
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		
-		private void handlePacket(Packet packet){
-			switch (packet.getType()){
-			
-			case CONNECT:
-				break;
-				
-			case CHAT:
-				ChatPacket cp = (ChatPacket)packet;
-				server.broadcast(new ChatPacket(cp.getMsg(), cp.getName()), Player.this);
-				break;
-			
-			default: break;
-			
-			}
-		}
-
-	}*/
-
+	
 }

@@ -1,6 +1,7 @@
 package me.neildennis.drawmything.server.packets;
 
 import me.neildennis.drawmything.client.utils.ChatUtils;
+import me.neildennis.drawmything.server.DrawServer;
 import me.neildennis.drawmything.server.game.Player;
 
 public class ChatPacket extends Packet {
@@ -28,7 +29,7 @@ public class ChatPacket extends Packet {
 	}
 
 	public void server(Player player){
-
+		DrawServer.getServer().broadcast(this, player);
 	}
 
 }

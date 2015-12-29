@@ -1,6 +1,5 @@
 package me.neildennis.drawmything.server.thread;
 
-import java.net.InetAddress;
 import java.util.ArrayList;
 
 import me.neildennis.drawmything.server.game.Player;
@@ -50,14 +49,6 @@ public class GameThread {
 
 	public void removePlayer(Player player) {
 		players.remove(player);
-	}
-
-	public InetAddress[] getAddresses() {
-		synchronized (players){
-			InetAddress[] toreturn = new InetAddress[players.size()];
-			for (int i = 0; i < players.size(); i++) toreturn[i] = players.get(i).getSocket().getInetAddress();
-			return toreturn;
-		}
 	}
 
 }

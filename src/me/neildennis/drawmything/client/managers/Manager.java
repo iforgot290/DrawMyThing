@@ -1,6 +1,7 @@
 package me.neildennis.drawmything.client.managers;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import me.neildennis.drawmything.client.exeptions.DrawException;
@@ -37,7 +38,7 @@ public abstract class Manager {
 
 	public static void init() throws UnknownHostException, ClassNotFoundException, IOException{
 		packetman = new PacketManager();
-		networkman = new NetworkManager("127.0.0.1", 8080);
+		networkman = new NetworkManager(InetAddress.getByName("127.0.0.1"), 8080);
 		gameman = new GameManager();
 		screenman = new ScreenManager();
 		gfxman = new GraphicsManager();

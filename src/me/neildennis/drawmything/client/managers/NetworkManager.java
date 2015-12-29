@@ -40,7 +40,7 @@ public class NetworkManager extends Manager{
 		this.host = host;
 		this.port = port;
 		tcpsocket = new Socket(host, port);
-		udpsocket = new DatagramSocket(8081);
+		udpsocket = new DatagramSocket();
 		pman = Manager.getPacketManager();
 
 		connect();
@@ -50,6 +50,9 @@ public class NetworkManager extends Manager{
 		service.execute(tcp = new TcpSend());
 		service.execute(new UdpAccept());
 		service.execute(udp = new UdpSend());
+		
+		String hi = "hi";
+		udp.queue.offer(new DatagramPacket(hi.getBytes(), hi.getBytes().length, InetAddress.getByName(host), port));
 	}
 
 	private void connect() throws IOException, ClassNotFoundException{

@@ -27,6 +27,8 @@ public class Player {
 	public Player(String username, Socket socket, Send send, Accept accept){
 		this.socket = socket;
 		this.username = username;
+		this.send = send;
+		this.accept = accept;
 		game = GameThread.getThread();
 	}
 
@@ -64,7 +66,7 @@ public class Player {
 	
 	//TODO handle disconnects properly
 	public void disconnect(String msg){
-		DrawServer.getServer().log(username + " has disconnected: "+msg);
+		DrawServer.log(username + " has disconnected: "+msg);
 		game.removePlayer(this);
 	}
 

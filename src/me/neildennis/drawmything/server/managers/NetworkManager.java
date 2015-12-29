@@ -29,6 +29,8 @@ public class NetworkManager extends ServManager {
 	public NetworkManager(int port) throws IOException{
 		this.game = GameThread.getThread();
 		this.server = DrawServer.getServer();
+		
+		DrawServer.log("Starting server on port: "+port);
 
 		this.port = port;
 		servsock = new ServerSocket(port);

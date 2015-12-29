@@ -2,11 +2,10 @@ package me.neildennis.drawmything.server;
 
 import java.io.IOException;
 import java.net.DatagramSocket;
-import java.net.ServerSocket;
 
 import me.neildennis.drawmything.server.game.Player;
+import me.neildennis.drawmything.server.managers.ServManager;
 import me.neildennis.drawmything.server.packets.Packet;
-import me.neildennis.drawmything.server.thread.ConnectThread;
 import me.neildennis.drawmything.server.thread.DrawBroadcastThread;
 import me.neildennis.drawmything.server.thread.GameThread;
 
@@ -15,11 +14,8 @@ public class DrawServer {
 	private static DrawServer main;
 	
 	private GameThread game;
-	private ConnectThread connect;
 	@SuppressWarnings("unused")
 	private DrawBroadcastThread udp;
-	
-	private ServerSocket serversock;
 	
 	public DrawServer(){
 		main = this;
@@ -36,27 +32,16 @@ public class DrawServer {
 	
 	public void init(){
 		try {
-			serversock = new ServerSocket(8080);
-			log("Starting server on port 8080");
-			
 			game = new GameThread();
-			connect = new ConnectThread(serversock);
+			ServManager.init();
 			udp = new DrawBroadcastThread(new DatagramSocket(8080));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public void log(Object str){
+	public static void log(Object str){
 		System.out.println("[" + Thread.currentThread().getName() + "] "+str);
-	}
-	
-	public ServerSocket getServerSock(){
-		return serversock;
-	}
-	
-	public ConnectThread getConnect(){
-		return connect;
 	}
 	
 	public void broadcast(Packet packet){

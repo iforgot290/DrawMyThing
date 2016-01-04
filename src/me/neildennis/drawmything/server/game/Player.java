@@ -10,6 +10,7 @@ import java.net.Socket;
 import me.neildennis.drawmything.server.DrawServer;
 import me.neildennis.drawmything.server.managers.NetworkManager.Accept;
 import me.neildennis.drawmything.server.managers.NetworkManager.Send;
+import me.neildennis.drawmything.server.packets.ChatPacket;
 import me.neildennis.drawmything.server.packets.Packet;
 import me.neildennis.drawmything.server.thread.GameThread;
 
@@ -66,10 +67,11 @@ public class Player {
 	
 	//TODO handle disconnects properly
 	public void disconnect(String msg){
-		DrawServer.log(username + " has disconnected: "+msg);
 		game.removePlayer(this);
 		accept.kill();
 		send.kill();
+		DrawServer.getServer().broadcast(new ChatPacket(username + " has disconnected: " + msg, null));
+		DrawServer.log(username + " has disconnected: " + msg);
 	}
 	
 }

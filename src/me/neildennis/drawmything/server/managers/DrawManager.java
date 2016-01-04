@@ -11,8 +11,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import me.neildennis.drawmything.server.DrawServer;
-
 public class DrawManager extends ServManager{
 
 	private ExecutorService service;
@@ -58,7 +56,6 @@ public class DrawManager extends ServManager{
 			String data = new String(packet.getData(), StandardCharsets.UTF_8);
 			if (data.startsWith("hi")){
 				addrs.put(packet.getAddress(), packet.getPort());
-				DrawServer.log("Adding "+packet.getPort()+" to send queue");
 			} else if (data.startsWith("bye")){
 				addrs.remove(packet.getAddress());
 			} else {

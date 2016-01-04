@@ -39,13 +39,13 @@ public class GraphicsManager extends Manager implements Runnable{
 			
 			if (delta >= 1.0) {
 				for (DrawComponent c : screen.getComponents()) c.tick();
+				for (DrawComponent c : screen.getComponents()) c.render();
+				
 				updates++;
+				frames++;
 				delta--;
 			}
 			
-			for (DrawComponent c : screen.getComponents()) c.render();
-			
-			frames++;
 			if (System.currentTimeMillis() - timer > 1000) {
 				timer += 1000;
 				frame.setTitle("DrawMyThing | "+frames+" fps "+updates+" ups");

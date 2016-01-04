@@ -33,16 +33,17 @@ public class Main{
 		if (username == null || username.equals("")){
 			main = null;
 			JOptionPane.showMessageDialog(null, "You need an username nigga", "Error", JOptionPane.ERROR_MESSAGE);
-		} else {
-			main = this;
-			
-			try {
-				Manager.init();
-			}  catch (Exception e) {
-				e.printStackTrace();
-				JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-				System.exit(1);
-			}
+			return;
+		}
+		
+		main = this;
+
+		try {
+			Manager.init();
+		}  catch (Exception e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+			System.exit(1);
 		}
 	}
 

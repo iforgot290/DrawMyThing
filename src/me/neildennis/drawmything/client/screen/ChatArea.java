@@ -57,6 +57,7 @@ public class ChatArea extends DrawComponent{
 		
 		registerClicks();
 		registerEvents();
+		chat(main.getUsername()+" has joined the server");
 	}
 
 	public void render(){

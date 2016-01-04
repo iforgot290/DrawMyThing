@@ -42,11 +42,12 @@ public class DrawArea extends DrawComponent{
 	private volatile double counter = 0;
 	private volatile double countmax = 0;
 	private volatile double last = 60;
-	
+
 	@SuppressWarnings("unused")
 	private boolean choosing = true;
-	private boolean drawing = true;
-	
+	private boolean drawing = false;
+	private boolean waiting = true;
+
 	private Color papercolor = new Color(0xfff297);
 	private Font paperfont;
 	private FontMetrics pmetrics;
@@ -91,13 +92,13 @@ public class DrawArea extends DrawComponent{
 
 		g.setColor(Color.WHITE);
 		g.fillOval(getWidth() - 130 + 57 - 46, 5 + 72 - 46, 46 * 2, 46 * 2);
-		
+
 		g.setColor(Color.RED);
 		if (last > 0){
 			int angle = (int) (((1-(counter/countmax))*360) * -1);
 			g.fillArc(getWidth() - 130 + 57 - 46, 5 + 72 - 46, 46 * 2, 46 * 2, 90, angle);
 		}
-			
+
 		g.setColor(Color.BLACK);
 		g.setFont(timerfont);
 
@@ -112,30 +113,48 @@ public class DrawArea extends DrawComponent{
 		g.drawString(timer, xpos, ypos);
 
 		g.drawImage(clockimg, getWidth() - 130, 5, 125, 125, null);
-		
+
 		if (drawing){
 			g.setColor(papercolor);
 			g.rotate(Math.toRadians(-1));
 			g.fillRect((getWidth()-50) / 2 - 200, 25, 400, 100);
-			
+
 			g.setColor(Color.BLACK);
 			g.setFont(paperfont);
-			
+
 			String todraw = "Your word is ";
 			String word = "Nigga";
 			bounds = ChatUtils.getStringBounds(g, todraw, 100, 100);
 			fheight = (int) bounds.getHeight();
 			fwidth = pmetrics.stringWidth(todraw+word);
-			
+
 			xpos = (getWidth() - 50) / 2 - fwidth / 2;
 			ypos = (25 + 50 - fheight / 2);
 			g.drawString(todraw, xpos, ypos);
-			
+
 			g.setColor(Color.RED);
 			g.drawString(word, xpos + pmetrics.stringWidth(todraw), ypos);
-			
+
 			xpos = (getWidth() - 50) / 2 - fwidth / 2;
 			ypos = (25 + 50 + fheight);
+		}
+
+		if (waiting){
+			g.setColor(papercolor);
+			g.rotate(Math.toRadians(-1));
+			g.fillRect((getWidth()-50) / 2 - 200, 25, 400, 100);
+
+			g.setColor(Color.BLACK);
+			g.setFont(paperfont);
+
+			String waiting = "Waiting for more players";
+			bounds = ChatUtils.getStringBounds(g, waiting, 100, 100);
+			fheight = (int) bounds.getHeight();
+			fwidth = pmetrics.stringWidth(waiting);
+
+			xpos = (getWidth() - 50) / 2 - fwidth / 2;
+			ypos = (25 + 50 - fheight / 2);
+			g.drawString(waiting, xpos, ypos);
 		}
 
 		g.dispose();
@@ -151,13 +170,15 @@ public class DrawArea extends DrawComponent{
 		clockimg = FileUtils.loadImage("/res/clock.png");
 		timerfont = new Font("Segoe UI", Font.BOLD, 35);
 		paperfont = new Font("Segoe UI", Font.BOLD, 25);
-		setTimer(60);
+		setTimer(0);
 	}
 
 	public void setTimer(int i){
 		countmax = i * 60;
 		counter = countmax;
-		last = 60;
+		if (i>0)
+			last = 60;
+		else last = 0;
 	}
 
 	public void clear(){
@@ -165,7 +186,7 @@ public class DrawArea extends DrawComponent{
 			pixels[i] = Color.WHITE.hashCode();
 		}
 	}
-	
+
 	private void draw(double oldx, double oldy, double currentx, double currenty){
 		Line2D line = new Line2D.Double(oldx, oldy, currentx, currenty);
 		game.queueLine(line);
@@ -216,7 +237,7 @@ public class DrawArea extends DrawComponent{
 				int currenty = e.getY();
 
 				if (currentx > getWidth() || currenty > getWidth() || currentx < 0 || currenty < 0) return;
-				
+
 				draw(oldx, oldy, currentx, currenty);
 
 				oldx = currentx;

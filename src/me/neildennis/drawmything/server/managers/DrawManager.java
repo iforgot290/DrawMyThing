@@ -6,7 +6,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -17,13 +17,13 @@ public class DrawManager extends ServManager{
 	private DatagramSocket socket;
 	
 	private UdpSend send;
-	private HashMap<InetAddress, Integer> addrs;
+	private ArrayList<Client> addrs;
 	
 	protected DrawManager(int port) throws SocketException{
 		socket = new DatagramSocket(port);
 		service = Executors.newCachedThreadPool();
 		
-		addrs = new HashMap<InetAddress, Integer>();
+		addrs = new ArrayList<Client>();
 		
 		service.execute(send = new UdpSend());
 		service.execute(new UdpAccept());
@@ -55,7 +55,7 @@ public class DrawManager extends ServManager{
 		private void handle(DatagramPacket packet){
 			String data = new String(packet.getData(), StandardCharsets.UTF_8);
 			if (data.startsWith("hi")){
-				addrs.put(packet.getAddress(), packet.getPort());
+				addrs.add(new Client(packet.getAddress(), packet.getPort()));
 			} else if (data.startsWith("bye")){
 				addrs.remove(packet.getAddress());
 			} else {
@@ -78,9 +78,9 @@ public class DrawManager extends ServManager{
 				if (!queue.isEmpty()){
 					DatagramPacket packet = queue.poll();
 					
-					for (InetAddress addr : addrs.keySet()){
-						packet.setAddress(addr);
-						packet.setPort(addrs.get(addr));
+					for (Client client : addrs){
+						packet.setAddress(client.addr);
+						packet.setPort(client.port);
 						try {
 							socket.send(packet);
 						} catch (IOException e) {
@@ -91,6 +91,16 @@ public class DrawManager extends ServManager{
 			}
 		}
 		
+	}
+	
+	private class Client{
+		public InetAddress addr;
+		public int port;
+		
+		public Client(InetAddress addr, int port){
+			this.addr = addr;
+			this.port = port;
+		}
 	}
 
 }
